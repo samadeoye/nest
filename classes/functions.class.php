@@ -56,6 +56,10 @@ function typeCastDouble($number)
 {
     return number_format($number, 2);
 }
+function typeCastInt($number)
+{
+    return intval($number);
+}
 
 function getTransactionReference($type)
 {
@@ -159,31 +163,35 @@ function doCheckParamIssetEmpty($param, $data)
         $isset = isset($_REQUEST[$param]);
         $value = $isset ? $_REQUEST[$param] : "";
     }
+    
     if($required)
     {
         $isset = $isset && !empty($value);
         if(!$isset)
         {
             $datax['status'] = false;
-            $datax['msg'] .= $label . ' ' . MSG_CANNOT_BE_EMPTY;
+            $datax['msg'] = $label . ' ' . MSG_IS_REQUIRED;
+            return $datax;
         }
     }
-    if($length[0] > 0)
+    if($length[0] > 0 && !empty($value))
     {
-        $isset = $isset && strlen($value) < $length[0];
+        $isset = $isset && strlen($value) >= $length[0];
         if(!$isset)
         {
             $datax['status'] = false;
-            $datax['msg'] .= $label . ' ' . MSG_MUST_BE_GREATER_THAN_EQUAL . ' ' . $length[0] .' '. strtolower(LBL_CHARACTERS);
+            $datax['msg'] = $label . ' ' . MSG_MUST_BE_GREATER_THAN_EQUAL . ' ' . $length[0] .' '. strtolower(LBL_CHARACTERS);
+            return $datax;
         }
     }
-    if($length[1] > 0)
+    if($length[1] > 0 && !empty($value))
     {
-        $isset = $isset && strlen($value) > $length[1];
+        $isset = $isset && strlen($value) <= $length[1];
         if(!$isset)
         {
             $datax['status'] = false;
-            $datax['msg'] .= $label . ' ' . MSG_MUST_BE_LESS_THAN_EQUAL . ' ' . $length[1] .' '. strtolower(LBL_CHARACTERS);
+            $datax['msg'] = $label . ' ' . MSG_MUST_BE_LESS_THAN_EQUAL . ' ' . $length[1] .' '. strtolower(LBL_CHARACTERS);
+            return $datax;
         }
     }
     return $datax;

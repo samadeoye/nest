@@ -2,14 +2,13 @@
 require_once '../util.php';
 require_once '../classes/users.class.php';
 
-$params = Params::getRequestParams('register');
+$params = Params::getRequestParams('update_profile');
 doValidateApiParams($params);
 
 $fname = trim($_POST['fname']);
 $lname = trim($_POST['lname']);
 $email = isset($_POST['email']) ? trim($_POST['email']) : "";
 $phone = trim($_POST['phone']);
-$password = trim($_POST['password']);
 $typeId = typeCastInt($_POST['type_id']);
 
 $data = [
@@ -17,8 +16,7 @@ $data = [
     'lname' => $lname,
     'email' => $email,
     'phone' => $phone,
-    'password' => $password,
     'type_id' => $typeId
 ];
 
-UserActions::registerUser($data);
+UserActions::updateUser($data);
