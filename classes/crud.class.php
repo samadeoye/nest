@@ -56,12 +56,21 @@ class CrudActions {
             $i = 0; 
             foreach($data['orWhere'] as $key => $value)
             {
-                $con = ($i > 0) ? " OR " : "";
+                $con = " OR ";
                 $where .= $con . $key . " = ?";
                 $i++;
             }
             $valuesx = array_values($data['orWhere']);
             $values = array_merge($values, $valuesx);
+        }
+
+        if(array_key_exists("order", $data))
+        {
+            $where .= " ORDER BY ". $data['order'];
+        }
+        if(array_key_exists("limit", $data))
+        {
+            $where .= " LIMIT ". $data['limit'];
         }
         
         $select = "SELECT ".$columns." FROM ".$table . $where;

@@ -116,14 +116,6 @@ function doValidateApiParams($data)
     {
         foreach($data as $key => $val)
         {
-            if(!isset($val['length']))
-            {
-                $val['length'] = [0,0];
-            }
-            if(!isset($val['required']))
-            {
-                $val['required'] = false;
-            }
             $validate = doCheckParamIssetEmpty($key, $val);
             if(!$validate['status'])
             {
@@ -141,8 +133,10 @@ function doCheckParamIssetEmpty($param, $data)
     
     $method = $data['method'];
     $label = $data['label'];
-    $length = $data['length'];
-    $required = $data['required'];
+    $length = isset($data['length']) ? $data['length'] : [0,0];
+    $required = isset($data['required']) ? $data['required'] : false;
+    $type = isset($data['type']) ? $data['type'] : "";
+    $isEmail = isset($data['is_email']) ? $data['is_email'] : false;
 
     if(empty($label))
     {
@@ -171,6 +165,36 @@ function doCheckParamIssetEmpty($param, $data)
         {
             $datax['status'] = false;
             $datax['msg'] = $label . ' ' . MSG_IS_REQUIRED;
+            return $datax;
+        }
+    }
+    if(!empty($type) && !empty($value))
+    {
+        if($type == 'string')
+        {
+            if(!is_string($value))
+            {
+                $datax['status'] = false;
+                $datax['msg'] = $label . ' must be a string.';
+                return $datax;
+            }
+        }
+        elseif($type == 'number')
+        {
+            if(!is_numeric($value))
+            {
+                $datax['status'] = false;
+                $datax['msg'] = $label . ' must contain only digits.';
+                return $datax;
+            }
+        }
+    }
+    if((!empty($value) && $isEmail) || (!empty($value) && trim($value) == 'email'))
+    {
+        if(!filter_var($value, FILTER_VALIDATE_EMAIL))
+        {
+            $datax['status'] = false;
+            $datax['msg'] = $label . ' must contain a valid email.';
             return $datax;
         }
     }
