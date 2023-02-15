@@ -226,3 +226,43 @@ function debugTest()
     echo 'test';
     exit;
 }
+
+function getMinutesDiff($time1, $time2)
+{
+    $time1 = strtotime(date('H:i:s', $time1));
+    $time2 = strtotime(date('H:i:s', $time2));
+    return round((abs($time1) / 60) - (abs($time2) / 60));
+}
+
+function getLoginTempSessions($emailPhone)
+{
+    $ar = [];
+    if(!isset($_SESSION['loginTemp']))
+    {
+        $_SESSION['loginTemp']['count'][$emailPhone] = 1;
+        $_SESSION['loginTemp']['locked'][$emailPhone] = false;
+    }
+    $ar = [
+        'count' => $_SESSION['loginTemp']['count'][$emailPhone],
+        'locked' => $_SESSION['loginTemp']['locked'][$emailPhone]
+    ];
+    return $ar;
+}
+function updateTempSessions($emailPhone, $data)
+{
+    if(array_key_exists('count', $data))
+    {
+        if($data['count'] == 'inc')
+        {
+            $_SESSION['loginTemp']['count'][$emailPhone]++;
+        }
+        elseif($data['count'] == 'reset')
+        {
+            $_SESSION['loginTemp']['count'][$emailPhone] = 0;
+        }
+    }
+    if(array_key_exists('locked', $data))
+    {
+        $_SESSION['loginTemp']['locked'][$emailPhone] = $data['locked'];
+    }
+}

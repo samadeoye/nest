@@ -100,8 +100,7 @@ class Params
                'phone' => [
                     'method' => 'post',
                     'length' => [11,15],
-                    'label' => LBL_PHONE,
-                    'required' => true
+                    'label' => LBL_PHONE
                 ],
                 'email' => [
                     'method' => 'post',
@@ -113,6 +112,23 @@ class Params
                     'method' => 'post',
                     'length' => [6,0],
                     'label' => LBL_PASSWORD,
+                    'required' => true
+                ]
+            ];
+        }
+        elseif($request == 'logout')
+        {
+            $data = [
+               'user_id' => [
+                    'method' => 'post',
+                    'length' => [1,0],
+                    'label' => LBL_USER,
+                    'required' => true
+                ],
+                'token' => [
+                    'method' => 'post',
+                    'length' => [10,10],
+                    'label' => LBL_TOKEN,
                     'required' => true
                 ]
             ];
