@@ -64,6 +64,19 @@ class CrudActions {
             $values = array_merge($values, $valuesx);
         }
 
+        if(array_key_exists("search", $data))
+        {
+            $i = 0;
+            foreach($data['search'] as $key => $value)
+            {
+                $where .= " WHERE";
+                $con = ($i > 0) ? " OR " : " ";
+                $where .= $con . $key . " LIKE ?";
+            }
+            $valuesx = array_values($data['search']);
+            $values = array_merge($values, $valuesx);
+        }
+
         if(array_key_exists("order", $data))
         {
             $where .= " ORDER BY ". $data['order'];
@@ -73,16 +86,16 @@ class CrudActions {
             $where .= " LIMIT ". $data['limit'];
         }
         
-        $select = "SELECT ".$columns." FROM ".$table . $where;
+        $select = "SELECT ".$columns." FROM ".$table . $where;//echo $select;exit;
         $select = $db->prepare($select);
         $select->execute($values);
         if($select->rowCount() > 0)
         {
             if($return_type == 'row')
             {
-                return $select->fetch();
+                return $select->fetch(PDO::FETCH_ASSOC);
             }
-            return $select->fetchAll();
+            return $select->fetchAll(PDO::FETCH_ASSOC);
         }
         return [];
     }

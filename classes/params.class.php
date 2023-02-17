@@ -121,7 +121,7 @@ class Params
             $data = [
                'user_id' => [
                     'method' => 'post',
-                    'length' => [1,0],
+                    'length' => [36,36],
                     'label' => LBL_USER,
                     'required' => true
                 ],
@@ -129,6 +129,91 @@ class Params
                     'method' => 'post',
                     'length' => [10,10],
                     'label' => LBL_TOKEN,
+                    'required' => true
+                ]
+            ];
+        }
+        elseif($request == 'create_savings_group')
+        {
+            $data = [
+               'user_id' => [
+                    'method' => 'post',
+                    'length' => [36,36],
+                    'label' => LBL_USER,
+                    'required' => true
+                ],
+                'group_name' => [
+                    'method' => 'post',
+                    'length' => [5,200],
+                    'label' => LBL_GROUP_NAME,
+                    'required' => true
+                ],
+                /*
+                    <--- SAVINGS GROUP TYPE ID --->
+                    Private: 1
+                    Public: 2
+                */
+                'type_id' => [
+                    'method' => 'post',
+                    'length' => [1,1],
+                    'label' => LBL_SAVINGS_GROUP_TYPE,
+                    'type' => 'number',
+                    'required' => true
+                ],
+                'action' => [
+                    'method' => 'post',
+                    'label' => LBL_ACTION,
+                    'required' => true
+                ]
+            ];
+        }
+        elseif($request == 'update_savings_group')
+        {
+            $data = [
+               'user_id' => [
+                    'method' => 'post',
+                    'length' => [36,36],
+                    'label' => LBL_USER,
+                    'required' => true
+                ],
+                'group_id' => [
+                    'method' => 'post',
+                    'length' => [1,0],
+                    'label' => LBL_GROUP,
+                    'required' => true
+                ],
+                'group_name' => [
+                    'method' => 'post',
+                    'length' => [5,200],
+                    'label' => LBL_GROUP_NAME,
+                    'required' => true
+                ],
+                /*
+                    <--- SAVINGS GROUP TYPE ID --->
+                    Private: 1
+                    Public: 2
+                */
+                'type_id' => [
+                    'method' => 'post',
+                    'length' => [1,1],
+                    'label' => LBL_SAVINGS_GROUP_TYPE,
+                    'type' => 'number',
+                    'required' => true
+                ],
+                'action' => [
+                    'method' => 'post',
+                    'label' => LBL_ACTION,
+                    'required' => true
+                ]
+            ];
+        }
+        elseif($request == 'search_savings_group')
+        {
+            $data = [
+               'keyword' => [
+                    'method' => 'post',
+                    'length' => [1,0],
+                    'label' => LBL_KEYWORD,
                     'required' => true
                 ]
             ];

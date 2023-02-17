@@ -198,6 +198,16 @@ function doCheckParamIssetEmpty($param, $data)
             return $datax;
         }
     }
+    if($length[0] > 0 && $length[1] > 0 && $length[0] == $length[1] && !empty($value))
+    {
+        $isset = $isset && strlen($value) == $length[0];
+        if(!$isset)
+        {
+            $datax['status'] = false;
+            $datax['msg'] = $label . ' ' . MSG_MUST_BE_EQUAL_TO . ' ' . $length[0] .' '. strtolower(LBL_CHARACTERS);
+            return $datax;
+        }
+    }
     if($length[0] > 0 && !empty($value))
     {
         $isset = $isset && strlen($value) >= $length[0];
