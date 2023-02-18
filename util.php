@@ -13,3 +13,4 @@ require_once 'header.auth.php';
 require_once 'db.php';
 require_once 'classes/crud.class.php';
 require_once 'classes/params.class.php';
+require_once 'classes/check.duplicates.class.php';

@@ -218,6 +218,28 @@ class Params
                 ]
             ];
         }
+        elseif($request == 'join_savings_group')
+        {
+            $data = [
+               'user_id' => [
+                    'method' => 'post',
+                    'length' => [36,36],
+                    'label' => LBL_USER,
+                    'required' => true
+                ],
+                'group_id' => [
+                    'method' => 'post',
+                    'length' => [1,0],
+                    'label' => LBL_GROUP,
+                    'required' => true
+                ],
+                'action' => [
+                    'method' => 'post',
+                    'label' => LBL_ACTION,
+                    'required' => true
+                ]
+            ];
+        }
         
         return $data;
     }
