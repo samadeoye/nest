@@ -244,19 +244,30 @@ function getMinutesDiff($time1, $time2)
     return round((abs($time1) / 60) - (abs($time2) / 60));
 }
 
-function getLoginTempSessions($emailPhone)
+function getLoginTempSessions($emailPhone, $key)
 {
-    $ar = [];
     if(!isset($_SESSION['loginTemp']))
     {
         $_SESSION['loginTemp']['count'][$emailPhone] = 1;
         $_SESSION['loginTemp']['locked'][$emailPhone] = false;
     }
-    $ar = [
-        'count' => $_SESSION['loginTemp']['count'][$emailPhone],
-        'locked' => $_SESSION['loginTemp']['locked'][$emailPhone]
-    ];
-    return $ar;
+    
+    if($key == 'count')
+    {
+        if(!isset($_SESSION['loginTemp']['count'][$emailPhone]))
+        {
+            $_SESSION['loginTemp']['count'][$emailPhone] = 1;
+        }
+        return $_SESSION['loginTemp']['count'][$emailPhone];
+    }
+    elseif($key == 'locked')
+    {
+        if(!isset($_SESSION['loginTemp']['locked'][$emailPhone]))
+        {
+            $_SESSION['loginTemp']['locked'][$emailPhone] = false;
+        }
+        return $_SESSION['loginTemp']['locked'][$emailPhone];
+    }
 }
 function updateTempSessions($emailPhone, $data)
 {
@@ -274,5 +285,61 @@ function updateTempSessions($emailPhone, $data)
     if(array_key_exists('locked', $data))
     {
         $_SESSION['loginTemp']['locked'][$emailPhone] = $data['locked'];
+    }
+}
+
+function getTypeFromTypeId($type, $id)
+{
+    if(!empty($type))
+    {
+        if(strtolower($type) == 'savings_plan')
+        {
+            if($id == 1)
+            {
+                return 'daily';
+            }
+            elseif($id == 2)
+            {
+                return 'weekly';
+            }
+            elseif($id == 3)
+            {
+                return 'monthly';
+            }
+        }
+        elseif(strtolower($type) == 'savings_duration')
+        {
+            if($id == 1)
+            {
+                return 'week';
+            }
+            elseif($id == 2)
+            {
+                return 'month';
+            }
+            elseif($id == 3)
+            {
+                return 'year';
+            }
+        }
+        if(strtolower($type) == 'user_type')
+        {
+            if($id == 1)
+            {
+                return 'underbanked';
+            }
+            elseif($id == 2)
+            {
+                return 'corporative society';
+            }
+            elseif($id == 3)
+            {
+                return 'digital professional';
+            }
+            elseif($id == 4)
+            {
+                return 'business';
+            }
+        }
     }
 }

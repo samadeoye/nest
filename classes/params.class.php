@@ -39,10 +39,10 @@ class Params
                 ],
                 /*
                     <--- USER TYPE ID --->
-                    Underbanked: 1
-                    Corporative Society: 2
-                    Digital Professional: 3
-                    Businesses: 4
+                    1: Underbanked
+                    2: Corporative Society
+                    3: Digital Professional
+                    4: Business
                 */
                 'type_id' => [
                     'method' => 'post',
@@ -81,10 +81,10 @@ class Params
                 ],
                 /*
                     <--- USER TYPE ID --->
-                    Underbanked: 1
-                    Corporative Society: 2
-                    Digital Professional: 3
-                    Businesses: 4
+                    1: Underbanked
+                    2: Corporative Society
+                    3: Digital Professional
+                    4: Business
                 */
                 'type_id' => [
                     'method' => 'post',
@@ -150,14 +150,58 @@ class Params
                 ],
                 /*
                     <--- SAVINGS GROUP TYPE ID --->
-                    Private: 1
-                    Public: 2
+                    1: private
+                    2: public
                 */
                 'type_id' => [
                     'method' => 'post',
                     'length' => [1,1],
                     'label' => LBL_SAVINGS_GROUP_TYPE,
                     'type' => 'number',
+                    'required' => true
+                ],
+                'plan' => [
+                    'method' => 'post',
+                    'label' => LBL_SAVINGS_PLAN .' - '.LBL_AMOUNT,
+                    'type' => 'number',
+                    'required' => true
+                ],
+                /*
+                    <--- SAVINGS PLAN TYPE ID --->
+                    1: daily
+                    2: weekly
+                    3: monthly
+                */
+                'plan_type_id' => [
+                    'method' => 'post',
+                    'length' => [1,1],
+                    'label' => LBL_PLAN_TYPE,
+                    'type' => 'number',
+                    'required' => true
+                ],
+                'duration' => [
+                    'method' => 'post',
+                    'label' => LBL_SAVINGS .' '. LBL_DURATION,
+                    'type' => 'number',
+                    'required' => true
+                ],
+                /*
+                    <--- SAVINGS DURATION TYPE ID --->
+                    1: week
+                    2: month
+                    3: year
+                */
+                'duration_type_id' => [
+                    'method' => 'post',
+                    'length' => [1,1],
+                    'label' => LBL_DURATION_TYPE,
+                    'type' => 'number',
+                    'required' => true
+                ],
+                'description' => [
+                    'method' => 'post',
+                    'length' => [10,0],
+                    'label' => LBL_DESCRIPTION,
                     'required' => true
                 ],
                 'action' => [
@@ -190,14 +234,58 @@ class Params
                 ],
                 /*
                     <--- SAVINGS GROUP TYPE ID --->
-                    Private: 1
-                    Public: 2
+                    1: private
+                    2: public
                 */
                 'type_id' => [
                     'method' => 'post',
                     'length' => [1,1],
                     'label' => LBL_SAVINGS_GROUP_TYPE,
                     'type' => 'number',
+                    'required' => true
+                ],
+                'plan' => [
+                    'method' => 'post',
+                    'label' => LBL_SAVINGS_PLAN .' - '.LBL_AMOUNT,
+                    'type' => 'number',
+                    'required' => true
+                ],
+                /*
+                    <--- SAVINGS PLAN TYPE ID --->
+                    1: daily
+                    2: weekly
+                    3: monthly
+                */
+                'plan_type_id' => [
+                    'method' => 'post',
+                    'length' => [1,1],
+                    'label' => LBL_PLAN_TYPE,
+                    'type' => 'number',
+                    'required' => true
+                ],
+                'duration' => [
+                    'method' => 'post',
+                    'label' => LBL_SAVINGS .' '. LBL_DURATION,
+                    'type' => 'number',
+                    'required' => true
+                ],
+                /*
+                    <--- SAVINGS DURATION TYPE ID --->
+                    1: week
+                    2: month
+                    3: year
+                */
+                'duration_type_id' => [
+                    'method' => 'post',
+                    'length' => [1,1],
+                    'label' => LBL_DURATION_TYPE,
+                    'type' => 'number',
+                    'required' => true
+                ],
+                'description' => [
+                    'method' => 'post',
+                    'length' => [10,0],
+                    'label' => LBL_DESCRIPTION,
                     'required' => true
                 ],
                 'action' => [
@@ -219,6 +307,28 @@ class Params
             ];
         }
         elseif($request == 'join_savings_group')
+        {
+            $data = [
+               'user_id' => [
+                    'method' => 'post',
+                    'length' => [36,36],
+                    'label' => LBL_USER,
+                    'required' => true
+                ],
+                'group_id' => [
+                    'method' => 'post',
+                    'length' => [1,0],
+                    'label' => LBL_GROUP,
+                    'required' => true
+                ],
+                'action' => [
+                    'method' => 'post',
+                    'label' => LBL_ACTION,
+                    'required' => true
+                ]
+            ];
+        }
+        elseif($request == 'details_savings_group')
         {
             $data = [
                'user_id' => [

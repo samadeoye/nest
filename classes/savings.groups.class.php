@@ -5,7 +5,7 @@ class SavingsGroup {
         if(count($data) > 0)
         {
             $datax = [
-                'where' => ['name' => $data['group_name']]
+                'where' => ['name' => $data['name']]
             ];
             if(Duplicates::checkDuplicates(DEF_TBL_SAVINGS_GROUPS, $datax))
             {
@@ -16,14 +16,11 @@ class SavingsGroup {
            
             $db->beginTransaction();
 
+            $data['name'] = strtoupper($data['name']);
+            $data['cdate'] = time();
             $create = CrudActions::insert(
                 DEF_TBL_SAVINGS_GROUPS,
-                [
-                    'user_id' => $data['user_id'],
-                    'name' => strtoupper($data['group_name']),
-                    'type_id' => $data['type_id'],
-                    'cdate' => time()
-                ]
+                $data
             );
             if($create)
             {
@@ -59,8 +56,8 @@ class SavingsGroup {
             $check = CrudActions::select(
                 DEF_TBL_SAVINGS_GROUPS,
                 [
-                    'columns' => 'group_id',
-                    'where' => ['name' => $data['group_name']]
+                    'columns' => 'id',
+                    'where' => ['name' => $data['name']]
                 ]
             );
             if(count($check) > 0)
@@ -71,14 +68,14 @@ class SavingsGroup {
                     getJsonRow(false, "Duplicate group name found!");
                 }
             }
+            $groupId = $data['group_id'];
+            $data['name'] = strtoupper($data['name']);
+            $data['mdate'] = time();
+            unset($data['group_id']);
             $create = CrudActions::update(
                 DEF_TBL_SAVINGS_GROUPS,
-                [
-                    'name' => strtoupper($data['group_name']),
-                    'type_id' => $data['type_id'],
-                    'mdate' => time()
-                ],
-                ['id' => $data['group_id']]
+                $data,
+                ['id' => $groupId]
             );
             if($create)
             {
@@ -149,7 +146,114 @@ class SavingsGroup {
         }
     }
 
-    public function checkIfGroupExists($groupId)
+    public static function getGroup($data)
+    {
+        if(count($data) > 0)
+        {
+            $userId = $data['user_id'];
+            $groupId = $data['group_id'];
+
+            if(!self::checkIfGroupExists($groupId))
+            {
+                getJsonRow(false, "Invalid group!");
+            }
+            if(!self::checkIfIsGroupMember($groupId, $userId))
+            {
+                getJsonRow(false, "You are not a member of this group.");
+            }
+            if(count($data) > 0)
+            {
+                $select = CrudActions::select(
+                    DEF_TBL_SAVINGS_GROUPS,
+                    [
+                        'columns' => 'id, name, plan, plan_type_id, duration, duration_type_id, description',
+                        'where' => [
+                            'id' => $groupId
+                        ]
+                    ]
+                );
+                if(count($select) > 0)
+                {
+                    $id = $select['id'];
+                    $name = $select['name'];
+                    $durationAppend = (typeCastInt($select['plan']) > 1) ? "s" : "";
+                    $datax = [
+                        'status' => true,
+                        'data' => [
+                            'id' => $id,
+                            'name' => $name,
+                            'plan' => typeCastDouble($select['plan']).'/'.getTypeFromTypeId('savings_plan', $select['plan_type_id']),
+                            'duration' => typeCastInt($select['duration']).' '.getTypeFromTypeId('savings_duration', $select['duration_type_id']).$durationAppend,
+                            'memebers' => self::getGroupMemebersCount($select['id']),
+                            'is_member' => self::checkIfIsGroupMember($groupId, $userId),
+                            'description' => $select['description'],
+                            /*
+                                To create a redirection from the endpoint below to the api savings_group endpoint for people using the link to join
+                            */
+                            'link' => SITE_LINK.'/join_group?id='.$id
+                        ]
+                    ];
+                    getJsonList($datax);
+                }
+                getJsonRow(false, "An error occurred");
+            }
+            getJsonRow(false, "No record found.");
+        }
+    }
+
+    public static function listGroup()
+    {   
+        $select = CrudActions::select(
+            DEF_TBL_SAVINGS_GROUPS,
+            [
+                'columns' => 'id, name, plan, plan_type_id, duration, duration_type_id, description',
+                'return_type' => 'all'
+            ]
+        );
+        if(count($select) > 0)
+        {
+            $datax = [
+                'status' => true,
+                'data' => []
+            ];
+            foreach($select as $r)
+            {
+                $durationAppend = (typeCastInt($r['plan']) > 1) ? "s" : "";
+                $datax['data'][] = [
+                    'id' => $r['id'],
+                    'name' => $r['name'],
+                    'plan' => typeCastDouble($r['plan']).'/'.getTypeFromTypeId('savings_plan', $r['plan_type_id']),
+                    'duration' => typeCastInt($r['duration']).' '.getTypeFromTypeId('savings_duration', $r['duration_type_id']).$durationAppend,
+                    'memebers' => self::getGroupMemebersCount($r['id']),
+                    'description' => $r['description'],
+                    /*
+                        To create a redirection from the endpoint below to the api savings_group endpoint for people using the link to join
+                    */
+                    'invite_link' => SITE_LINK.'/join_group?id='.$r['id']
+                ];
+            }
+            getJsonList($datax);
+        }
+        getJsonRow(false, "No record found.");
+    }
+
+    public static function getGroupMemebersCount($groupId)
+    {
+        if(!empty($groupId))
+        {
+            $count = CrudActions::select(
+                DEF_TBL_SAVINGS_GROUPS_USERS,
+                [
+                    'columns' => 'COUNT(id) AS count',
+                    'where' => ['parent_id' => $groupId]
+                ]
+            );
+            return typeCastInt($count['count']);
+        }
+        return 0;
+    }
+
+    public static function checkIfGroupExists($groupId)
     {
         $select = CrudActions::select(
             DEF_TBL_SAVINGS_GROUPS,
@@ -165,7 +269,7 @@ class SavingsGroup {
         return false;
     }
 
-    public function checkIfIsGroupOwner($groupId, $userId)
+    public static function checkIfIsGroupOwner($groupId, $userId)
     {
         $select = CrudActions::select(
             DEF_TBL_SAVINGS_GROUPS,
@@ -180,6 +284,28 @@ class SavingsGroup {
         if(count($select) > 0)
         {
             return true;
+        }
+        return false;
+    }
+    public static function checkIfIsGroupMember($groupId, $userId)
+    {
+        if(!empty($groupId) && strlen($userId) == 36)
+        {
+            $select = CrudActions::select(
+                DEF_TBL_SAVINGS_GROUPS_USERS,
+                [
+                    'columns' => 'id',
+                    'where' => [
+                        'parent_id' => $groupId,
+                        'user_id' => $userId
+                    ]
+                ]
+            );
+            if(count($select) > 0)
+            {
+                return true;
+            }
+            return false;
         }
         return false;
     }
