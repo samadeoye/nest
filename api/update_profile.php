@@ -1,6 +1,7 @@
 <?php
-require_once '../util.php';
-require_once '../classes/users.class.php';
+use Nest\Params\Params;
+use Nest\Users\UserActions;
+require_once '../includes/util.php';
 
 $params = Params::getRequestParams('update_profile');
 doValidateApiParams($params);

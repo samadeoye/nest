@@ -1,4 +1,8 @@
 <?php
+namespace Nest\SavingsGroup;
+use Nest\Crud\CrudActions;
+use Nest\Duplicates;
+
 class SavingsGroup {
     public static function createGroup($data)
     {

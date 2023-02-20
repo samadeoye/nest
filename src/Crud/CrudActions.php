@@ -1,4 +1,6 @@
 <?php
+namespace Nest\Crud;
+
 class CrudActions {
     public static function insert($table, $data)
     {
@@ -67,9 +69,9 @@ class CrudActions {
         if(array_key_exists("search", $data))
         {
             $i = 0;
+            $where .= empty($where) ? " WHERE" : " AND";
             foreach($data['search'] as $key => $value)
             {
-                $where .= " WHERE";
                 $con = ($i > 0) ? " OR " : " ";
                 $where .= $con . $key . " LIKE ?";
             }
@@ -93,9 +95,9 @@ class CrudActions {
         {
             if($return_type == 'row')
             {
-                return $select->fetch(PDO::FETCH_ASSOC);
+                return $select->fetch(\PDO::FETCH_ASSOC);
             }
-            return $select->fetchAll(PDO::FETCH_ASSOC);
+            return $select->fetchAll(\PDO::FETCH_ASSOC);
         }
         return [];
     }

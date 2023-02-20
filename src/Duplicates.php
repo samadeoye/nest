@@ -1,4 +1,7 @@
 <?php
+namespace Nest;
+use Nest\Crud\CrudActions;
+
 class Duplicates {
     public static function checkDuplicates($table, $data)
     {

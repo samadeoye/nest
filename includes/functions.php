@@ -189,7 +189,7 @@ function doCheckParamIssetEmpty($param, $data)
             }
         }
     }
-    if((!empty($value) && $isEmail) || (!empty($value) && trim($value) == 'email'))
+    if((!empty($value) && $isEmail) || (!empty($value) && trim($param) == 'email'))
     {
         if(!filter_var($value, FILTER_VALIDATE_EMAIL))
         {

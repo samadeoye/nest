@@ -1,7 +1,7 @@
 <?php
-echo 'util.php';exit;
-require_once DEF_ROOT_PATH . '/util.php';
-require_once DEF_PATH_CLASSES.'/savings.groups.class.php';
+use Nest\Params\Params;
+use Nest\SavingsGroup\SavingsGroup;
+require_once '../includes/util.php';
 
 
 $action = isset($_POST['action']) ? trim($_POST['action']) : "";

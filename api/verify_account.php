@@ -3,10 +3,9 @@ use Nest\Params\Params;
 use Nest\Users\UserActions;
 require_once '../includes/util.php';
 
-$params = Params::getRequestParams('logout');
+$params = Params::getRequestParams('verify_account');
 doValidateApiParams($params);
 
-$userId = trim($_POST['user_id']);
 $token = trim($_POST['token']);
 
-UserActions::logoutUser($userId, $token);
+UserActions::verifyUser($token);

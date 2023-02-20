@@ -3,12 +3,11 @@ use Nest\Params\Params;
 use Nest\Users\UserActions;
 require_once '../includes/util.php';
 
-$params = Params::getRequestParams('login');
+$params = Params::getRequestParams('request_verification');
 doValidateApiParams($params);
 
 $email = $emailPhone = isset($_POST['email']) ? trim($_POST['email']) : "";
 $phone = isset($_POST['phone']) ? trim($_POST['phone']) : "";
-$password = trim($_POST['password']);
 
 if(empty($email) && empty($phone))
 {
@@ -22,4 +21,4 @@ if(empty($email))
     $emailPhone = $phone;
 }
 
-UserActions::authUser($emailPhone, $password, $type);
+UserActions::sendMailOrSMS($emailPhone, $type, "verify", true);
