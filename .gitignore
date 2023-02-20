@@ -1,4 +1,4 @@
-/db.php
-/constants.php
-/header.auth.php
+/includes/db.php
+/includes/constants.php
+/includes/header.auth.php
 /classes/users.class.php

@@ -1,6 +1,8 @@
 <?php
-require_once '../util.php';
-require_once '../classes/savings.groups.class.php';
+echo 'util.php';exit;
+require_once DEF_ROOT_PATH . '/util.php';
+require_once DEF_PATH_CLASSES.'/savings.groups.class.php';
+
 
 $action = isset($_POST['action']) ? trim($_POST['action']) : "";
 if(!in_array($action, ['create', 'update', 'search', 'join', 'details', 'list']))
