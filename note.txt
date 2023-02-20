@@ -1,5 +1,0 @@
-<----
-To create a redirection from 
-{nest main domain}/join_group
-to the api savings_groups endpoint for joining the group.
----->
