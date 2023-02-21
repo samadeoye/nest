@@ -11,6 +11,10 @@ class ComposerStaticInit51e961af9e6d105e4eb62b2158ff0b79
         array (
             'Nest\\' => 5,
         ),
+        'F' => 
+        array (
+            'Firebase\\JWT\\' => 13,
+        ),
     );
 
     public static $prefixDirsPsr4 = array (
@@ -18,10 +22,26 @@ class ComposerStaticInit51e961af9e6d105e4eb62b2158ff0b79
         array (
             0 => __DIR__ . '/../..' . '/src',
         ),
+        'Firebase\\JWT\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/firebase/php-jwt/src',
+        ),
     );
 
     public static $classMap = array (
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
+        'Firebase\\JWT\\BeforeValidException' => __DIR__ . '/..' . '/firebase/php-jwt/src/BeforeValidException.php',
+        'Firebase\\JWT\\CachedKeySet' => __DIR__ . '/..' . '/firebase/php-jwt/src/CachedKeySet.php',
+        'Firebase\\JWT\\ExpiredException' => __DIR__ . '/..' . '/firebase/php-jwt/src/ExpiredException.php',
+        'Firebase\\JWT\\JWK' => __DIR__ . '/..' . '/firebase/php-jwt/src/JWK.php',
+        'Firebase\\JWT\\JWT' => __DIR__ . '/..' . '/firebase/php-jwt/src/JWT.php',
+        'Firebase\\JWT\\Key' => __DIR__ . '/..' . '/firebase/php-jwt/src/Key.php',
+        'Firebase\\JWT\\SignatureInvalidException' => __DIR__ . '/..' . '/firebase/php-jwt/src/SignatureInvalidException.php',
+        'Nest\\Crud\\CrudActions' => __DIR__ . '/../..' . '/src/Crud/CrudActions.php',
+        'Nest\\Duplicates' => __DIR__ . '/../..' . '/src/Duplicates.php',
+        'Nest\\Params\\Params' => __DIR__ . '/../..' . '/src/Params/Params.php',
+        'Nest\\SavingsGroup\\SavingsGroup' => __DIR__ . '/../..' . '/src/SavingsGroup/SavingsGroup.php',
+        'Nest\\Users\\UserActions' => __DIR__ . '/../..' . '/src/Users/UserActions.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

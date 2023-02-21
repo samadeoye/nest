@@ -3,5 +3,8 @@
         "psr-4": {
             "Nest\\": "src"
         }
+    },
+    "require": {
+        "firebase/php-jwt": "^6.4"
     }
 }
