@@ -1,11 +1,8 @@
 <?php
-use Nest\Auth\ApiAuth;
 use Nest\Params\Params;
 use Nest\SavingsGroup\SavingsGroup;
 require_once '../includes/util.php';
-echo (int)class_exists('Nest\Auth\ApiAuth');
-//$token = $_POST['token'];
-new ApiAuth("fhj0cgvrijthytjytko");exit;
+
 
 $action = isset($_POST['action']) ? trim($_POST['action']) : "";
 if(!in_array($action, ['create', 'update', 'search', 'join', 'details', 'list']))
