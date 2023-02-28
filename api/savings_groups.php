@@ -37,7 +37,6 @@ if($action != 'list')
 
 if(in_array($action, ['create', 'update']))
 {
-    $userId = trim($_POST['user_id']);
     $groupTypeId = trim($_POST['type_id']);
     $groupName = trim($_POST['group_name']);
     $plan = trim($_POST['plan']);
@@ -47,7 +46,6 @@ if(in_array($action, ['create', 'update']))
     $description = trim($_POST['description']);
 
     $data = [
-        'user_id' => $userId,
         'type_id' => $groupTypeId,
         'name' => $groupName,
         'plan' => $plan,
@@ -63,11 +61,9 @@ elseif($action == 'search')
 }
 elseif(in_array($action, ['join', 'details']))
 {
-    $userId = trim($_POST['user_id']);
     $groupId = trim($_POST['group_id']);
 
     $data = [
-        'user_id' => $userId,
         'group_id' => $groupId
     ];
 }

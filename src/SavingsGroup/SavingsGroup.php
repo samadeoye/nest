@@ -6,6 +6,8 @@ use Nest\Duplicates;
 class SavingsGroup {
     public static function createGroup($data)
     {
+        global $userId;
+
         if(count($data) > 0)
         {
             $datax = [
@@ -32,7 +34,7 @@ class SavingsGroup {
                 $insert = CrudActions::insert(
                     DEF_TBL_SAVINGS_GROUPS_USERS,
                     [
-                        'user_id' => $data['user_id'],
+                        'user_id' => $userId,
                         'parent_id' => $groupId,
                         'cdate' => time()
                     ]
@@ -51,9 +53,11 @@ class SavingsGroup {
 
     public static function updateGroup($data)
     {
+        global $userId;
+
         if(count($data) > 0)
         {
-            if(!self::checkIfIsGroupOwner($data['group_id'], $data['user_id']))
+            if(!self::checkIfIsGroupOwner($data['group_id'], $userId))
             {
                 getJsonRow(false, "You cannot update this group as you are not the owner.");
             }
@@ -120,13 +124,15 @@ class SavingsGroup {
 
     public static function joinGroup($data)
     {
+        global $userId;
+
         if(count($data) > 0)
         {
             if(!self::checkIfGroupExists($data['group_id']))
             {
                 getJsonRow(false, "Invalid group!");
             }
-            if(!self::checkIfIsGroupOwner($data['group_id'], $data['user_id']))
+            if(!self::checkIfIsGroupOwner($data['group_id'], $userId))
             {
                 getJsonRow(false, "You are already added to this group as you are the owner.");
             }
@@ -154,7 +160,7 @@ class SavingsGroup {
     {
         if(count($data) > 0)
         {
-            $userId = $data['user_id'];
+            global $userId;
             $groupId = $data['group_id'];
 
             if(!self::checkIfGroupExists($groupId))

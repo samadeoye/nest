@@ -116,6 +116,17 @@ class Params
 
             case 'verify_account':
                 $data = [
+                    'phone' => [
+                        'method' => 'post',
+                        'length' => [11,15],
+                        'label' => LBL_PHONE
+                    ],
+                    'email' => [
+                        'method' => 'post',
+                        'length' => [13,200],
+                        'label' => LBL_EMAIL,
+                        'is_email' => true
+                    ],
                    'token' => [
                         'method' => 'post',
                         'length' => [6,6],
@@ -189,12 +200,6 @@ class Params
 
             case 'logout':
                 $data = [
-                    'user_id' => [
-                        'method' => 'post',
-                        'length' => [36,36],
-                        'label' => LBL_USER,
-                        'required' => true
-                    ],
                     'token' => [
                         'method' => 'post',
                         'length' => [10,10],
@@ -206,12 +211,6 @@ class Params
 
             case 'create_savings_group':
                 $data = [
-                    'user_id' => [
-                        'method' => 'post',
-                        'length' => [36,36],
-                        'label' => LBL_USER,
-                        'required' => true
-                    ],
                     'group_name' => [
                         'method' => 'post',
                         'length' => [5,200],
@@ -284,12 +283,6 @@ class Params
 
             case 'update_savings_group':
                 $data = [
-                    'user_id' => [
-                        'method' => 'post',
-                        'length' => [36,36],
-                        'label' => LBL_USER,
-                        'required' => true
-                    ],
                     'group_id' => [
                         'method' => 'post',
                         'length' => [1,0],
@@ -379,12 +372,6 @@ class Params
 
             case 'join_savings_group':
                 $data = [
-                    'user_id' => [
-                        'method' => 'post',
-                        'length' => [36,36],
-                        'label' => LBL_USER,
-                        'required' => true
-                    ],
                     'group_id' => [
                         'method' => 'post',
                         'length' => [1,0],
@@ -401,12 +388,6 @@ class Params
 
             case 'details_savings_group':
                 $data = [
-                    'user_id' => [
-                        'method' => 'post',
-                        'length' => [36,36],
-                        'label' => LBL_USER,
-                        'required' => true
-                    ],
                     'group_id' => [
                         'method' => 'post',
                         'length' => [1,0],
