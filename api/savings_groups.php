@@ -1,6 +1,6 @@
 <?php
 use Nest\Params\Params;
-use Nest\SavingsGroup\SavingsGroup;
+use Nest\Savings\SavingsGroup;
 require_once '../includes/util.php';
 
 
@@ -38,7 +38,7 @@ if($action != 'list')
 if(in_array($action, ['create', 'update']))
 {
     $groupTypeId = trim($_POST['type_id']);
-    $groupName = trim($_POST['group_name']);
+    $groupName = strtoupper(trim($_POST['group_name']));
     $plan = trim($_POST['plan']);
     $planType = trim($_POST['plan_type_id']);
     $duration = trim($_POST['duration']);

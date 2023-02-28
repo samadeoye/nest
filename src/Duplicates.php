@@ -13,6 +13,7 @@ class Duplicates {
                 $duplicates = CrudActions::select(
                     $table,
                     [
+                        'columns' => 'id',
                         'where' => $data['where'],
                         'orWhere' => $data['orWhere']
                     ]
@@ -23,6 +24,7 @@ class Duplicates {
                 $duplicates = CrudActions::select(
                     $table,
                     [
+                        'columns' => 'id',
                         'where' => $data['where']
                     ]
                 );

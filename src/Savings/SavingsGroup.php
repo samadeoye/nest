@@ -1,5 +1,6 @@
 <?php
-namespace Nest\SavingsGroup;
+namespace Nest\Savings;
+
 use Nest\Crud\CrudActions;
 use Nest\Duplicates;
 
@@ -22,7 +23,7 @@ class SavingsGroup {
            
             $db->beginTransaction();
 
-            $data['name'] = strtoupper($data['name']);
+            $data['id'] = getNewId();
             $data['cdate'] = time();
             $create = CrudActions::insert(
                 DEF_TBL_SAVINGS_GROUPS,
@@ -34,6 +35,7 @@ class SavingsGroup {
                 $insert = CrudActions::insert(
                     DEF_TBL_SAVINGS_GROUPS_USERS,
                     [
+                        'id' => getNewId(),
                         'user_id' => $userId,
                         'parent_id' => $groupId,
                         'cdate' => time()
@@ -77,7 +79,6 @@ class SavingsGroup {
                 }
             }
             $groupId = $data['group_id'];
-            $data['name'] = strtoupper($data['name']);
             $data['mdate'] = time();
             unset($data['group_id']);
             $create = CrudActions::update(
