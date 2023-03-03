@@ -12,36 +12,45 @@ if(!in_array($action, ['create', 'update']))
 
 if($action == 'create')
 {
-    $params = Params::getRequestParams('create_savings');
+    $params = Params::getRequestParams('create_regular_savings');
 }
 elseif($action == 'update')
 {
-    $params = Params::getRequestParams('update_savings');
+    $params = Params::getRequestParams('update_regular_savings');
 }
 doValidateApiParams($params);
 
 if(in_array($action, ['create', 'update']))
 {
-    $typeId = trim($_POST['type_id']);
     $name = strtoupper(trim($_POST['name']));
-    $amount = trim($_POST['amount']);
     $planTypeId = trim($_POST['plan_type_id']);
     $duration = trim($_POST['duration']);
     $durationTypeId = trim($_POST['duration_type_id']);
     $description = isset($_POST['description']) ? trim($_POST['description']) : "";
-    $payFirst = trim($_REQUEST['pay_first']);
     $fundingSourceId = trim($_REQUEST['funding_source_type_id']);
 
+    if($action == 'create')
+    {
+        $amount = doTypeCastDouble($_POST['starting_amount']);
+        $payFirst = doTypeCastInt($_REQUEST['pay_first']);
+    }
+
+    /*
+        <--- SAVINGS TYPE ID --->
+        1: regular
+        2: target
+        3: vault
+        4: flex
+    */
+
     $data = [
-        'type_id' => $typeId,
+        'type_id' => 1,
         'name' => $name,
-        'amount' => $amount,
         'plan_type_id' => $planTypeId,
         'duration' => $duration,
         'duration_type_id' => $durationTypeId,
         'funding_source_type_id' => $fundingSourceId,
-        'description' => $description,
-        'pay_first' => $payFirst
+        'description' => $description
     ];
 
     if($fundingSourceId == DEF_SAVINGS_FUNDING_SOURCE_CARD)
@@ -49,7 +58,7 @@ if(in_array($action, ['create', 'update']))
         $savedCardId = isset($_REQUEST['saved_card_id']) ? trim($_REQUEST['saved_card_id']) : "";
         if(strlen($savedCardId) != 36)
         {
-            getJsonRow(false, "Funding souce invalid!");
+            getJsonRow(false, "Funding source invalid!");
         }
         $data['saved_card_id'] = $savedCardId;
     }
@@ -57,11 +66,15 @@ if(in_array($action, ['create', 'update']))
 
 if($action == 'create')
 {
+    $data['pay_first'] = $payFirst;
+    $data['amount'] = $amount;
+
     Savings::createSavings($data);
 }
 elseif($action == 'update')
 {
     $savingsId = trim($_POST['savings_id']);
     $data['savings_id'] = $savingsId;
-    Savings::updateGroup($data);
+
+    Savings::updateSavings($data);
 }

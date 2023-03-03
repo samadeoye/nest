@@ -2,9 +2,11 @@
 namespace Nest\Savings;
 
 use Nest\Crud\CrudActions;
+use Nest\Users\UserActions;
 use Nest\Duplicates;
 
 class Savings {
+    public static $table = DEF_TBL_SAVINGS;
     public static function createSavings($data)
     {
         global $db, $userId;
@@ -20,103 +22,137 @@ class Savings {
             ];
             if(Duplicates::checkDuplicates(DEF_TBL_SAVINGS, $datax))
             {
-                getJsonRow(false, "Duplicate group name found! You already have a savings with this name.");
+                getJsonRow(false, "Duplicate savings name found! You already have a savings with this name.");
+            }
+
+            try {
+                $db->beginTransaction();
+
+                $savingsId = getNewId();
+                $data['id'] = $savingsId;
+                $data['cdate'] = time();
+                $data['user_id'] = $userId;
+                $create = CrudActions::insert(
+                    DEF_TBL_SAVINGS,
+                    $data
+                );
+                if($create)
+                {
+                    $savingsAmount = doTypeCastDouble($data['amount']);
+                    $fundingSourceId = $data['funding_source_type_id'];
+
+                    $insert = CrudActions::insert(
+                        DEF_TBL_SAVINGS_TRANS,
+                        [
+                            'id' => getNewId(),
+                            'user_id' => $userId,
+                            'parent_id' => $savingsId,
+                            'amount' => $savingsAmount,
+                            'funding_source_type_id' => $fundingSourceId,
+                            'cdate' => time()
+                            //to add tdate when when making payment
+                        ]
+                    );
+                    if(!$insert)
+                    {
+                        getJsonRow(false, "An error occurred. Try again.");
+                    }
+
+                    //initialize savings transaction
+                    $payFirst = $data['pay_first'];
+                    if($payFirst == 1)
+                    {
+                        //check if user has enough balance
+                        $balance = doTypeCastDouble(UserActions::getUserInfo('balance'));
+                        if($balance == 0 || $balance < $savingsAmount)
+                        {
+                            getJsonRow(false, "You do not have enough balance for this transaction.");
+                        }
+                        if($fundingSourceId == DEF_SAVINGS_FUNDING_SOURCE_WALLET)
+                        {
+                            $processDone = false;
+                            //deduct from user wallet
+                            $newBalance = doTypeCastDouble($balance - $savingsAmount);
+                            CrudActions::update(
+                                DEF_TBL_USERS,
+                                ['balance' => $newBalance]
+                            );
+                            $updateTrans = CrudActions::update(
+                                DEF_TBL_SAVINGS_TRANS,
+                                [
+                                    'status' => 1,
+                                    'tdate' => time()
+                                ]
+                            );
+                            if($updateTrans)
+                            {
+                                $processDone = true;
+                            }
+                        }
+                        if($fundingSourceId == DEF_SAVINGS_FUNDING_SOURCE_CARD)
+                        {
+                            //initialize payment gateway
+                        }
+                    }
+                    if($processDone)
+                    {
+                        $db->commit();
+
+                        $msg = "Savings created successfully.";
+                        if($payFirst == 1)
+                        {
+                            $msg = "Transaction completed successfully.";
+                        }
+                        getJsonRow(true, $msg);
+                    }
+                }
+                getJsonRow(false, "An error occurred. Try again.");
+
+            }
+            catch (\Exception $e)
+            {
+                $db->rollback();
+                getJsonRow(false, "An error occurred. Try again.");
             }
            
-            $db->beginTransaction();
-
-            $savingsId = getNewId();
-            $data['id'] = $savingsId;
-            $data['cdate'] = time();
-            $data['user_id'] = $userId;
-            $create = CrudActions::insert(
-                DEF_TBL_SAVINGS,
-                $data
-            );
-            if($create)
-            {
-                $savingsAmount = $data['amount'];
-                $fundingSourceId = $data['funding_source_type_id'];
-                $cdate = $tdate = time();
-
-                $insert = CrudActions::insert(
-                    DEF_TBL_SAVINGS_TRANS,
-                    [
-                        'id' => getNewId(),
-                        'user_id' => $userId,
-                        'parent_id' => $savingsId,
-                        'amount' => $savingsAmount,
-                        'funding_source_type_id' => $fundingSourceId,
-                        'cdate' => $cdate
-                        //to add tdate when when making payment
-                    ]
-                );
-                if($insert)
-                {
-                    $db->commit();
-                    getJsonRow(true, "Savings created successfully.");
-
-                    //INITIALIZE SAVINGS TRANSACTION
-                    if($fundingSourceId == DEF_SAVINGS_FUNDING_SOURCE_WALLET)
-                    {
-                        //DEDUCT FROM USER WALLET
-                    }
-                    if($fundingSourceId == DEF_SAVINGS_FUNDING_SOURCE_CARD)
-                    {
-                        //INITIALIZE PAYMENT GATEWAY
-                    }
-                    //getJsonRow(true, "Savings created successfully.");
-                }
-                else
-                {
-                    $db->rollBack();
-                    getJsonRow(false, "An error occurred. Try again.");
-                }
-                
-            }
-            getJsonRow(false, "An error occurred. Try again.");
         }
     }
 
-    public static function updateGroup($data)
+    public static function updateSavings($data)
     {
         global $userId;
 
         if(count($data) > 0)
         {
-            if(!self::checkIfIsGroupOwner($data['group_id'], $userId))
-            {
-                getJsonRow(false, "You cannot update this group as you are not the owner.");
-            }
+            $savingsId = $data['savings_id'];
             $check = CrudActions::select(
-                DEF_TBL_SAVINGS_GROUPS,
+                self::$table,
                 [
                     'columns' => 'id',
-                    'where' => ['name' => $data['name']]
+                    'where' => [
+                        'name' => $data['name'],
+                        'user_id' => $userId,
+                        'deleted' => 0
+                    ]
                 ]
             );
+            
             if(count($check) > 0)
             {
-                //check if name is for the same group
-                if($check['id'] != $data['group_id'])
+                //check if name is for the same user
+                if($check['id'] != $savingsId)
                 {
-                    getJsonRow(false, "Duplicate group name found!");
+                    getJsonRow(false, "Duplicate savings name found!");
                 }
             }
-            $groupId = $data['group_id'];
-            $data['name'] = strtoupper($data['name']);
-            $data['mdate'] = time();
-            unset($data['group_id']);
-            $create = CrudActions::update(
-                DEF_TBL_SAVINGS_GROUPS,
+            unset($data['savings_id']);
+            CrudActions::update(
+                self::$table,
                 $data,
-                ['id' => $groupId]
+                ['id' => $savingsId]
             );
-            if($create)
-            {
-                getJsonRow(true, "Group updated successfully.");
-            }
-            getJsonRow(false, "An error occurred. Try again.");
+            getJsonRow(true, "Savings updated successfully.");
+           
         }
     }
 
@@ -151,14 +187,14 @@ class Savings {
                 {
                     $id = $select['id'];
                     $name = $select['name'];
-                    $durationAppend = (typeCastInt($select['plan']) > 1) ? "s" : "";
+                    $durationAppend = (doTypeCastInt($select['plan']) > 1) ? "s" : "";
                     $datax = [
                         'status' => true,
                         'data' => [
                             'id' => $id,
                             'name' => $name,
-                            'plan' => typeCastDouble($select['plan']).'/'.getTypeFromTypeId('savings_plan', $select['plan_type_id']),
-                            'duration' => typeCastInt($select['duration']).' '.getTypeFromTypeId('savings_duration', $select['duration_type_id']).$durationAppend,
+                            'plan' => doNumberFormat($select['plan']).'/'.getTypeFromTypeId('savings_plan', $select['plan_type_id']),
+                            'duration' => doTypeCastInt($select['duration']).' '.getTypeFromTypeId('savings_duration', $select['duration_type_id']).$durationAppend,
                             'memebers' => self::getGroupMemebersCount($select['id']),
                             'is_member' => self::checkIfIsGroupMember($groupId, $userId),
                             'description' => $select['description'],

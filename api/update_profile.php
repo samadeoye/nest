@@ -13,7 +13,7 @@ $fname = trim($_POST['fname']);
 $lname = trim($_POST['lname']);
 $email = isset($_POST['email']) ? trim($_POST['email']) : "";
 $phone = trim($_POST['phone']);
-$typeId = typeCastInt($_POST['type_id']);
+$typeId = doTypeCastInt($_POST['type_id']);
 
 $data = [
     'fname' => $fname,

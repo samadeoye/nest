@@ -52,11 +52,15 @@ function cleanme($text)
     return $cleanit;
 }
 
-function typeCastDouble($number)
+function doNumberFormat($number)
 {
     return number_format($number, 2);
 }
-function typeCastInt($number)
+function doTypeCastDouble($number)
+{
+    return doubleval($number);
+}
+function doTypeCastInt($number)
 {
     return intval($number);
 }
@@ -78,7 +82,7 @@ function getNewId()
     .substr($charId, 20, 12);
     return $id;
 }
-  
+
 function doCheckIfEmpty($data)
 {
     if(count($data) > 0)
@@ -204,7 +208,7 @@ function doCheckParamIssetEmpty($param, $data)
         if(!$isset)
         {
             $datax['status'] = false;
-            $datax['msg'] = $label . ' ' . MSG_MUST_BE_EQUAL_TO . ' ' . $length[0] .' '. strtolower(LBL_CHARACTERS);
+            $datax['msg'] = $label . ' is invalid.';
             return $datax;
         }
     }

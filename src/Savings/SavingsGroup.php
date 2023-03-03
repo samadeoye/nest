@@ -187,14 +187,14 @@ class SavingsGroup {
                 {
                     $id = $select['id'];
                     $name = $select['name'];
-                    $durationAppend = (typeCastInt($select['plan']) > 1) ? "s" : "";
+                    $durationAppend = (doTypeCastInt($select['plan']) > 1) ? "s" : "";
                     $datax = [
                         'status' => true,
                         'data' => [
                             'id' => $id,
                             'name' => $name,
-                            'plan' => typeCastDouble($select['plan']).'/'.getTypeFromTypeId('savings_plan', $select['plan_type_id']),
-                            'duration' => typeCastInt($select['duration']).' '.getTypeFromTypeId('savings_duration', $select['duration_type_id']).$durationAppend,
+                            'plan' => doNumberFormat($select['plan']).'/'.getTypeFromTypeId('savings_plan', $select['plan_type_id']),
+                            'duration' => doTypeCastInt($select['duration']).' '.getTypeFromTypeId('savings_duration', $select['duration_type_id']).$durationAppend,
                             'memebers' => self::getGroupMemebersCount($select['id']),
                             'is_member' => self::checkIfIsGroupMember($groupId, $userId),
                             'description' => $select['description'],
@@ -229,12 +229,12 @@ class SavingsGroup {
             ];
             foreach($select as $r)
             {
-                $durationAppend = (typeCastInt($r['plan']) > 1) ? "s" : "";
+                $durationAppend = (doTypeCastInt($r['plan']) > 1) ? "s" : "";
                 $datax['data'][] = [
                     'id' => $r['id'],
                     'name' => $r['name'],
-                    'plan' => typeCastDouble($r['plan']).'/'.getTypeFromTypeId('savings_plan', $r['plan_type_id']),
-                    'duration' => typeCastInt($r['duration']).' '.getTypeFromTypeId('savings_duration', $r['duration_type_id']).$durationAppend,
+                    'plan' => doNumberFormat($r['plan']).'/'.getTypeFromTypeId('savings_plan', $r['plan_type_id']),
+                    'duration' => doTypeCastInt($r['duration']).' '.getTypeFromTypeId('savings_duration', $r['duration_type_id']).$durationAppend,
                     'memebers' => self::getGroupMemebersCount($r['id']),
                     'description' => $r['description'],
                     /*
@@ -259,7 +259,7 @@ class SavingsGroup {
                     'where' => ['parent_id' => $groupId]
                 ]
             );
-            return typeCastInt($count['count']);
+            return doTypeCastInt($count['count']);
         }
         return 0;
     }
