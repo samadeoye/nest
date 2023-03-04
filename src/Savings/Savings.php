@@ -41,6 +41,7 @@ class Savings {
                     $savingsAmount = doTypeCastDouble($data['amount']);
                     $fundingSourceId = $data['funding_source_type_id'];
 
+                    //insert temp record into the savings transactions
                     $insert = CrudActions::insert(
                         DEF_TBL_SAVINGS_TRANS,
                         [
@@ -156,7 +157,7 @@ class Savings {
         }
     }
 
-    public static function getGroup($data)
+    public static function getSavings($data)
     {
         if(count($data) > 0)
         {
@@ -210,41 +211,6 @@ class Savings {
             }
             getJsonRow(false, "No record found.");
         }
-    }
-
-    public static function checkIfGroupExists($groupId)
-    {
-        $select = CrudActions::select(
-            DEF_TBL_SAVINGS_GROUPS,
-            [
-                'columns' => 'id',
-                'where' => ['id' => $groupId]
-            ]
-        );
-        if(count($select) > 0)
-        {
-            return true;
-        }
-        return false;
-    }
-
-    public static function checkIfIsGroupOwner($groupId, $userId)
-    {
-        $select = CrudActions::select(
-            DEF_TBL_SAVINGS_GROUPS,
-            [
-                'columns' => 'id',
-                'where' => [
-                    'id' => $groupId,
-                    'user_id' => $userId
-                ]
-            ]
-        );
-        if(count($select) > 0)
-        {
-            return true;
-        }
-        return false;
     }
 
     public static function doGetSavingsRecord($recordId, $arFields=['*'])

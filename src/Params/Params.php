@@ -467,7 +467,8 @@ class Params
                     'description' => [
                         'method' => 'post',
                         'length' => [10,250],
-                        'label' => 'Savings Description'
+                        'label' => 'Savings Description',
+                        'required' => true
                     ],
                     /*
                         <--- FUNDING SOURCE TYPE ID --->
@@ -502,85 +503,195 @@ class Params
                         'required' => true
                     ]
                 ];
-                break;
+            break;
 
-                case 'update_regular_savings':
-                    $data = [
-                        'savings_id' => [
-                            'method' => 'post',
-                            'length' => [36,36],
-                            'label' => 'Savings',
-                            'required' => true
-                        ],
-                        'name' => [
-                            'method' => 'post',
-                            'length' => [5,100],
-                            'label' => 'Savings Name',
-                            'required' => true
-                        ],
-                        /*
-                            <--- SAVINGS PLAN TYPE ID --->
-                            0: anytime
-                            1: daily
-                            2: weekly
-                            3: monthly
-                        */
-                        'plan_type_id' => [
-                            'method' => 'post',
-                            'length' => [1,1],
-                            'label' => LBL_PLAN_TYPE,
-                            'type' => 'number',
-                            'required' => true
-                        ],
-                        'duration' => [
-                            'method' => 'post',
-                            'label' => 'Savings Duration',
-                            'type' => 'number',
-                            'required' => true
-                        ],
-                        /*
-                            <--- SAVINGS DURATION TYPE ID --->
-                            1: week
-                            2: month
-                            3: year
-                            //to ask Chris to change the design so that they select duration type and number separately
-                        */
-                        'duration_type_id' => [
-                            'method' => 'post',
-                            'length' => [1,1],
-                            'label' => LBL_DURATION_TYPE,
-                            'type' => 'number',
-                            'required' => true
-                        ],
-                        'description' => [
-                            'method' => 'post',
-                            'length' => [10,250],
-                            'label' => 'Savings Description'
-                        ],
-                        /*
-                            <--- FUNDING SOURCE TYPE ID --->
-                            1: wallet
-                            2: card
-                            //need to make a different endpoint to give the user's saved cards
-                        */
-                        'funding_source_type_id' => [
-                            'method' => 'post',
-                            'length' => [1,1],
-                            'label' => 'Funding Source',
-                            'required' => true
-                        ],
-                        'saved_card_id' => [
-                            'method' => 'post',
-                            'length' => [36,36],
-                            'label' => 'Saved Card'
-                        ],
-                        'action' => [
-                            'method' => 'post',
-                            'label' => 'Action',
-                            'required' => true
-                        ]
-                    ];
-                    break;
+            case 'update_regular_savings':
+                $data = [
+                    'savings_id' => [
+                        'method' => 'post',
+                        'length' => [36,36],
+                        'label' => 'Savings',
+                        'required' => true
+                    ],
+                    'name' => [
+                        'method' => 'post',
+                        'length' => [5,100],
+                        'label' => 'Savings Name',
+                        'required' => true
+                    ],
+                    /*
+                        <--- SAVINGS PLAN TYPE ID --->
+                        0: anytime
+                        1: daily
+                        2: weekly
+                        3: monthly
+                    */
+                    'plan_type_id' => [
+                        'method' => 'post',
+                        'length' => [1,1],
+                        'label' => LBL_PLAN_TYPE,
+                        'type' => 'number',
+                        'required' => true
+                    ],
+                    'duration' => [
+                        'method' => 'post',
+                        'label' => 'Savings Duration',
+                        'type' => 'number',
+                        'required' => true
+                    ],
+                    /*
+                        <--- SAVINGS DURATION TYPE ID --->
+                        1: week
+                        2: month
+                        3: year
+                        //to ask Chris to change the design so that they select duration type and number separately
+                    */
+                    'duration_type_id' => [
+                        'method' => 'post',
+                        'length' => [1,1],
+                        'label' => LBL_DURATION_TYPE,
+                        'type' => 'number',
+                        'required' => true
+                    ],
+                    'description' => [
+                        'method' => 'post',
+                        'length' => [10,250],
+                        'label' => 'Savings Description',
+                        'required' => true
+                    ],
+                    /*
+                        <--- FUNDING SOURCE TYPE ID --->
+                        1: wallet
+                        2: card
+                        //need to make a different endpoint to give the user's saved cards
+                    */
+                    'funding_source_type_id' => [
+                        'method' => 'post',
+                        'length' => [1,1],
+                        'label' => 'Funding Source',
+                        'required' => true
+                    ],
+                    'saved_card_id' => [
+                        'method' => 'post',
+                        'length' => [36,36],
+                        'label' => 'Saved Card'
+                    ],
+                    'action' => [
+                        'method' => 'post',
+                        'label' => 'Action',
+                        'required' => true
+                    ]
+                ];
+            break;
+
+            case 'create_target_savings':
+                $data = [
+                    'name' => [
+                        'method' => 'post',
+                        'length' => [5,100],
+                        'label' => 'Savings Name',
+                        'required' => true
+                    ],
+                    'target_amount' => [
+                        'method' => 'post',
+                        'label' => 'Starting Amount',
+                        'type' => 'number',
+                        'required' => true
+                    ],
+                    /*
+                        <--- SAVINGS PLAN TYPE ID --->
+                        0: anytime
+                        1: daily
+                        2: weekly
+                        3: monthly
+                    */
+                    'plan_type_id' => [
+                        'method' => 'post',
+                        'length' => [1,1],
+                        'label' => LBL_PLAN_TYPE,
+                        'type' => 'number',
+                        'required' => true
+                    ],
+                    'duration' => [
+                        'method' => 'post',
+                        'label' => 'Savings Duration',
+                        'type' => 'number',
+                        'required' => true
+                    ],
+                    /*
+                        <--- SAVINGS DURATION TYPE ID --->
+                        1: week
+                        2: month
+                        3: year
+                        //to ask Chris to change the design so that they select duration type and number separately
+                    */
+                    'duration_type_id' => [
+                        'method' => 'post',
+                        'length' => [1,1],
+                        'label' => LBL_DURATION_TYPE,
+                        'type' => 'number',
+                        'required' => true
+                    ],
+                    'start_date' => [
+                        'method' => 'post',
+                        'label' => 'Start Date'
+                    ],
+                    'end_date' => [
+                        'method' => 'post',
+                        'label' => 'End Date'
+                    ],
+                    'description' => [
+                        'method' => 'post',
+                        'length' => [10,250],
+                        'label' => 'Savings Description',
+                        'required' => true
+                    ],
+                    /*
+                        <--- FUNDING SOURCE TYPE ID --->
+                        1: wallet
+                        2: card
+                        //need to make a different endpoint to give the user's saved cards
+                    */
+                    'funding_source_type_id' => [
+                        'method' => 'post',
+                        'length' => [1,1],
+                        'label' => 'Funding Source',
+                        'required' => true
+                    ],
+                    'saved_card_id' => [
+                        'method' => 'post',
+                        'length' => [36,36],
+                        'label' => 'Saved Card'
+                    ],
+                    'action' => [
+                        'method' => 'post',
+                        'label' => 'Action',
+                        'required' => true
+                    ]
+                ];
+            break;
+
+            case 'update_target_savings':
+                $data = [
+                    'name' => [
+                        'method' => 'post',
+                        'length' => [5,100],
+                        'label' => 'Savings Name',
+                        'required' => true
+                    ],
+                    'description' => [
+                        'method' => 'post',
+                        'length' => [10,250],
+                        'label' => 'Savings Description',
+                        'required' => true
+                    ],
+                    'action' => [
+                        'method' => 'post',
+                        'label' => 'Action',
+                        'required' => true
+                    ]
+                ];
+            break;
         }
         
         return $data;
