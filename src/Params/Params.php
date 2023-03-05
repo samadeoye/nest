@@ -432,10 +432,10 @@ class Params
                     ],
                     /*
                         <--- SAVINGS PLAN TYPE ID --->
-                        0: anytime
                         1: daily
                         2: weekly
                         3: monthly
+                        4: anytime
                     */
                     'plan_type_id' => [
                         'method' => 'post',
@@ -487,16 +487,6 @@ class Params
                         'length' => [36,36],
                         'label' => 'Saved Card'
                     ],
-                    /*
-                        0: user is NOT paying at the point of creating savings
-                        1: user is paying at the point of creating savings
-                    */
-                    'pay_first' => [
-                        'method' => 'post',
-                        'length' => [1,1],
-                        'label' => 'First Payment',
-                        'required' => true
-                    ],
                     'action' => [
                         'method' => 'post',
                         'label' => 'Action',
@@ -521,10 +511,10 @@ class Params
                     ],
                     /*
                         <--- SAVINGS PLAN TYPE ID --->
-                        0: anytime
                         1: daily
                         2: weekly
                         3: monthly
+                        4: anytime
                     */
                     'plan_type_id' => [
                         'method' => 'post',
@@ -594,16 +584,16 @@ class Params
                     ],
                     'target_amount' => [
                         'method' => 'post',
-                        'label' => 'Starting Amount',
+                        'label' => 'Target Amount',
                         'type' => 'number',
                         'required' => true
                     ],
                     /*
                         <--- SAVINGS PLAN TYPE ID --->
-                        0: anytime
                         1: daily
                         2: weekly
                         3: monthly
+                        4: anytime
                     */
                     'plan_type_id' => [
                         'method' => 'post',
@@ -634,11 +624,13 @@ class Params
                     ],
                     'start_date' => [
                         'method' => 'post',
-                        'label' => 'Start Date'
+                        'label' => 'Start Date',
+                        'required' => true
                     ],
                     'end_date' => [
                         'method' => 'post',
-                        'label' => 'End Date'
+                        'label' => 'End Date',
+                        'required' => true
                     ],
                     'description' => [
                         'method' => 'post',
@@ -692,8 +684,109 @@ class Params
                     ]
                 ];
             break;
+
+            case 'create_vault_savings':
+                $data = [
+                    'name' => [
+                        'method' => 'post',
+                        'length' => [5,100],
+                        'label' => 'Savings Name',
+                        'required' => true
+                    ],
+                    'vault_amount' => [
+                        'method' => 'post',
+                        'label' => 'Vault Amount',
+                        'type' => 'number',
+                        'required' => true
+                    ],
+                    //to make a separate endpoint for vault types list
+                    'vault_type_id' => [
+                        'method' => 'post',
+                        'label' => 'Vault Type',
+                        'length' => [36,36],
+                        'required' => true
+                    ],
+                    'payout_date' => [
+                        'method' => 'post',
+                        'label' => 'Payout Date',
+                        'required' => true
+                    ],
+                    'description' => [
+                        'method' => 'post',
+                        'length' => [10,250],
+                        'label' => 'Savings Description',
+                        'required' => true
+                    ],
+                    /*
+                        <--- FUNDING SOURCE TYPE ID --->
+                        1: wallet
+                        2: card
+                        //need to make a different endpoint to give the user's saved cards
+                    */
+                    'funding_source_type_id' => [
+                        'method' => 'post',
+                        'length' => [1,1],
+                        'label' => 'Funding Source',
+                        'required' => true
+                    ],
+                    'saved_card_id' => [
+                        'method' => 'post',
+                        'length' => [36,36],
+                        'label' => 'Saved Card'
+                    ],
+                    'action' => [
+                        'method' => 'post',
+                        'label' => 'Action',
+                        'required' => true
+                    ]
+                ];
+            break;
+
+            case 'update_vault_savings':
+                $data = [
+                    'name' => [
+                        'method' => 'post',
+                        'length' => [5,100],
+                        'label' => 'Savings Name',
+                        'required' => true
+                    ],
+                    'description' => [
+                        'method' => 'post',
+                        'length' => [10,250],
+                        'label' => 'Savings Description',
+                        'required' => true
+                    ],
+                    'action' => [
+                        'method' => 'post',
+                        'label' => 'Action',
+                        'required' => true
+                    ]
+                ];
+            break;
         }
         
         return $data;
+    }
+
+    public static function getParamId($request)
+    {
+        global $currentPath;
+
+        $arPath = explode('/', $currentPath);
+        $pathIndex = array_search($request, $arPath);
+        if($pathIndex == false)
+        {
+            $pathIndex = array_search($request.'.php', $arPath);
+        }
+        if(is_numeric($pathIndex))
+        {
+            $pathToFind = $pathIndex + 1;
+            if(isset($arPath[$pathToFind]))
+            {
+                //requesting for a single record; get id
+                return $arPath[$pathToFind];
+            }
+        }
+        return '';
     }
 }

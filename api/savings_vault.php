@@ -12,11 +12,11 @@ if(!in_array($action, ['create', 'update']))
 
 if($action == 'create')
 {
-    $params = Params::getRequestParams('create_target_savings');
+    $params = Params::getRequestParams('create_vault_savings');
 }
 elseif($action == 'update')
 {
-    $params = Params::getRequestParams('update_target_savings');
+    $params = Params::getRequestParams('update_vault_savings');
 }
 doValidateApiParams($params);
 
@@ -35,27 +35,21 @@ if(in_array($action, ['create', 'update']))
 
     if($action == 'create')
     {
-        $planTypeId = trim($_POST['plan_type_id']);
-        $duration = trim($_POST['duration']);
-        $durationTypeId = trim($_POST['duration_type_id']);
+        $vaultTypeId = trim($_POST['vault_type_id']);
         $fundingSourceId = trim($_REQUEST['funding_source_type_id']);
         $savedCardId = isset($_REQUEST['saved_card_id']) ? trim($_REQUEST['saved_card_id']) : "";
-        $amount = doTypeCastDouble($_POST['target_amount']);
-        $startDate = isset($_REQUEST['start_date']) ? trim($_REQUEST['start_date']) : "";
-        $endDate = isset($_REQUEST['end_date']) ? trim($_REQUEST['end_date']) : "";
+        $amount = doTypeCastDouble($_POST['vault_amount']);
+        $payoutDate = isset($_REQUEST['payout_date']) ? trim($_REQUEST['payout_date']) : "";
 
         $data = [
-            'type_id' => DEF_SAVINGS_TYPE_TARGET,
+            'type_id' => DEF_SAVINGS_TYPE_VAULT,
+            'vault_type_id' => $vaultTypeId,
             'name' => $name,
+            'description' => $description,
             'amount' => $amount,
-            'plan_type_id' => $planTypeId,
-            'duration' => $duration,
-            'duration_type_id' => $durationTypeId,
             'funding_source_type_id' => $fundingSourceId,
             'saved_card_id' => $savedCardId,
-            'description' => $description,
-            'start_date' => $startDate,
-            'end_date' => $endDate
+            'payout_date' => $payoutDate
         ];
 
         Savings::createSavings($data);

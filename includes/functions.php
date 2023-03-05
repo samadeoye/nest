@@ -208,7 +208,14 @@ function doCheckParamIssetEmpty($param, $data)
         if(!$isset)
         {
             $datax['status'] = false;
-            $datax['msg'] = $label . ' is invalid.';
+            if(strpos($param, '_id') !== false)
+            {
+                $data['msg'] = $label . ' in invalid.';
+            }
+            else
+            {
+                $datax['msg'] = $label . ' ' . MSG_MUST_BE_EQUAL_TO . ' ' . $length[0] .' '. strtolower(LBL_CHARACTERS);
+            }
             return $datax;
         }
     }
@@ -218,7 +225,14 @@ function doCheckParamIssetEmpty($param, $data)
         if(!$isset)
         {
             $datax['status'] = false;
-            $datax['msg'] = $label . ' ' . MSG_MUST_BE_GREATER_THAN_EQUAL . ' ' . $length[0] .' '. strtolower(LBL_CHARACTERS);
+            if(strpos($param, '_id') !== false)
+            {
+                $data['msg'] = $label . ' in invalid.';
+            }
+            else
+            {
+                $datax['msg'] = $label . ' ' . MSG_MUST_BE_GREATER_THAN_EQUAL . ' ' . $length[0] .' '. strtolower(LBL_CHARACTERS);
+            }
             return $datax;
         }
     }
@@ -228,7 +242,14 @@ function doCheckParamIssetEmpty($param, $data)
         if(!$isset)
         {
             $datax['status'] = false;
-            $datax['msg'] = $label . ' ' . MSG_MUST_BE_LESS_THAN_EQUAL . ' ' . $length[1] .' '. strtolower(LBL_CHARACTERS);
+            if(strpos($param, '_id') !== false)
+            {
+                $data['msg'] = $label . ' in invalid.';
+            }
+            else
+            {
+                $datax['msg'] = $label . ' ' . MSG_MUST_BE_LESS_THAN_EQUAL . ' ' . $length[1] .' '. strtolower(LBL_CHARACTERS);
+            }
             return $datax;
         }
     }
@@ -326,7 +347,7 @@ function getTypeFromTypeId($type, $id)
                 return 'year';
             }
         }
-        if(strtolower($type) == 'user_type')
+        elseif(strtolower($type) == 'user_type')
         {
             if($id == 1)
             {
@@ -345,5 +366,29 @@ function getTypeFromTypeId($type, $id)
                 return 'business';
             }
         }
+        elseif(strtolower($type) == 'savings_type')
+        {
+            if($id == DEF_SAVINGS_TYPE_REGULAR)
+            {
+                return 'regular';
+            }
+            elseif($id == DEF_SAVINGS_TYPE_TARGET)
+            {
+                return 'target';
+            }
+            elseif($id == DEF_SAVINGS_TYPE_VAULT)
+            {
+                return 'vault';
+            }
+            elseif($id == DEF_SAVINGS_TYPE_FLEX)
+            {
+                return 'flex';
+            }
+        }
     }
+}
+
+function getDateFormat($date)
+{
+    return date('d-m-Y i:s A', $date);
 }

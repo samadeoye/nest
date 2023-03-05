@@ -28,6 +28,7 @@ if(in_array($action, ['create', 'update']))
     $durationTypeId = trim($_POST['duration_type_id']);
     $description = isset($_POST['description']) ? trim($_POST['description']) : "";
     $fundingSourceId = trim($_REQUEST['funding_source_type_id']);
+    $savedCardId = isset($_REQUEST['saved_card_id']) ? trim($_REQUEST['saved_card_id']) : "";
 
     if($action == 'create')
     {
@@ -44,31 +45,19 @@ if(in_array($action, ['create', 'update']))
     */
 
     $data = [
-        'type_id' => 1,
+        'type_id' => DEF_SAVINGS_TYPE_REGULAR,
         'name' => $name,
         'plan_type_id' => $planTypeId,
         'duration' => $duration,
         'duration_type_id' => $durationTypeId,
         'funding_source_type_id' => $fundingSourceId,
+        'saved_card_id' => $savedCardId,
         'description' => $description
     ];
-
-    if($fundingSourceId == DEF_SAVINGS_FUNDING_SOURCE_CARD)
-    {
-        $savedCardId = isset($_REQUEST['saved_card_id']) ? trim($_REQUEST['saved_card_id']) : "";
-        if(strlen($savedCardId) != 36)
-        {
-            getJsonRow(false, "Funding source invalid!");
-        }
-        $data['saved_card_id'] = $savedCardId;
-    }
 }
 
 if($action == 'create')
 {
-    $data['pay_first'] = $payFirst;
-    $data['amount'] = $amount;
-
     Savings::createSavings($data);
 }
 elseif($action == 'update')

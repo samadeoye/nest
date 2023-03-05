@@ -7,6 +7,7 @@ use Nest\Duplicates;
 
 class Savings {
     public static $table = DEF_TBL_SAVINGS;
+    public static $tableTrans = DEF_TBL_SAVINGS_TRANS;
     public static function createSavings($data)
     {
         global $db, $userId;
@@ -32,46 +33,60 @@ class Savings {
                 $data['id'] = $savingsId;
                 $data['cdate'] = time();
                 $data['user_id'] = $userId;
+                if(array_key_exists('start_date', $data))
+                {
+                    $data['start_date'] = strtotime($data['start_date']);
+                }
+                if(array_key_exists('end_date', $data))
+                {
+                    $data['end_date'] = strtotime($data['end_date']);
+                }
+                if(array_key_exists('payout_date', $data))
+                {
+                    $data['payout_date'] = strtotime($data['payout_date']);
+                }
+                
                 $create = CrudActions::insert(
                     DEF_TBL_SAVINGS,
                     $data
                 );
                 if($create)
                 {
-                    $savingsAmount = doTypeCastDouble($data['amount']);
-                    $fundingSourceId = $data['funding_source_type_id'];
+                    $savingsType = $data['type_id'];
+                    $processDone = true;
 
-                    //insert temp record into the savings transactions
-                    $insert = CrudActions::insert(
-                        DEF_TBL_SAVINGS_TRANS,
-                        [
-                            'id' => getNewId(),
-                            'user_id' => $userId,
-                            'parent_id' => $savingsId,
-                            'amount' => $savingsAmount,
-                            'funding_source_type_id' => $fundingSourceId,
-                            'cdate' => time()
-                            //to add tdate when when making payment
-                        ]
-                    );
-                    if(!$insert)
+                    //initialize savings transaction for regular savings only
+                    if($savingsType == DEF_SAVINGS_TYPE_REGULAR)
                     {
-                        getJsonRow(false, "An error occurred. Try again.");
-                    }
+                        $savingsAmount = doTypeCastDouble($data['amount']);
+                        $fundingSourceId = $data['funding_source_type_id'];
 
-                    //initialize savings transaction
-                    $payFirst = $data['pay_first'];
-                    if($payFirst == 1)
-                    {
+                        $insert = CrudActions::insert(
+                            self::$tableTrans,
+                            [
+                                'id' => getNewId(),
+                                'user_id' => $userId,
+                                'parent_id' => $savingsId,
+                                'amount' => $savingsAmount,
+                                'funding_source_type_id' => $fundingSourceId,
+                                'cdate' => time()
+                                //to add tdate when when making payment
+                            ]
+                        );
+                        if(!$insert)
+                        {
+                            $processDone = false;
+                            getJsonRow(false, "An error occurred while processing your first transaction savings. Try again.");
+                        }
                         //check if user has enough balance
                         $balance = doTypeCastDouble(UserActions::getUserInfo('balance'));
                         if($balance == 0 || $balance < $savingsAmount)
                         {
+                            $processDone = false;
                             getJsonRow(false, "You do not have enough balance for this transaction.");
                         }
                         if($fundingSourceId == DEF_SAVINGS_FUNDING_SOURCE_WALLET)
                         {
-                            $processDone = false;
                             //deduct from user wallet
                             $newBalance = doTypeCastDouble($balance - $savingsAmount);
                             CrudActions::update(
@@ -79,15 +94,15 @@ class Savings {
                                 ['balance' => $newBalance]
                             );
                             $updateTrans = CrudActions::update(
-                                DEF_TBL_SAVINGS_TRANS,
+                                self::$tableTrans,
                                 [
                                     'status' => 1,
                                     'tdate' => time()
                                 ]
                             );
-                            if($updateTrans)
+                            if(!$updateTrans)
                             {
-                                $processDone = true;
+                                $processDone = false;
                             }
                         }
                         if($fundingSourceId == DEF_SAVINGS_FUNDING_SOURCE_CARD)
@@ -95,19 +110,20 @@ class Savings {
                             //initialize payment gateway
                         }
                     }
+
                     if($processDone)
                     {
                         $db->commit();
 
                         $msg = "Savings created successfully.";
-                        if($payFirst == 1)
+                        if($savingsType == DEF_SAVINGS_TYPE_REGULAR)
                         {
-                            $msg = "Transaction completed successfully.";
+                            $msg = "Savings created! First transaction completed successfully.";
                         }
                         getJsonRow(true, $msg);
                     }
                 }
-                getJsonRow(false, "An error occurred. Try again.");
+                getJsonRow(false, "An error occurred while creating your savings. Try again.");
 
             }
             catch (\Exception $e)
@@ -157,73 +173,80 @@ class Savings {
         }
     }
 
-    public static function getSavings($data)
+    public static function getSavings($recordId='')
     {
-        if(count($data) > 0)
+        $rs = self::doGetSavingsRecord($recordId, ['*']);
+        if(count($rs) > 0)
         {
-            global $userId;
+            $data = ['status' => true, 'data' => []];
 
-            $groupId = $data['group_id'];
+            $counter = 0;
+            foreach($rs as $r)
+            {
+                $durationAppend = doTypeCastInt($r['duration']) > 1 ? "s" : "";
+                $savingsTypeId = $r['type_id'];
+                $savingsId = $r['id'];
+                $amount = $r['amount'];
+                $totalAmountSaved = self::doGetTotalAmountSaved($savingsId);
 
-            if(!self::checkIfGroupExists($groupId))
-            {
-                getJsonRow(false, "Invalid group!");
-            }
-            if(!self::checkIfIsGroupMember($groupId, $userId))
-            {
-                getJsonRow(false, "You are not a member of this group.");
-            }
-            if(count($data) > 0)
-            {
-                $select = CrudActions::select(
-                    DEF_TBL_SAVINGS_GROUPS,
-                    [
-                        'columns' => 'id, name, plan, plan_type_id, duration, duration_type_id, description',
-                        'where' => [
-                            'id' => $groupId
-                        ]
-                    ]
-                );
-                if(count($select) > 0)
+                $data['data'][$counter] = [
+                    'id' => $savingsId,
+                    'name' => $r['name'],
+                    'description' => $r['description'],
+                    'savings_type' => getTypeFromTypeId('savings_type', $savingsTypeId),
+                ];
+                if($savingsTypeId == DEF_SAVINGS_TYPE_REGULAR)
                 {
-                    $id = $select['id'];
-                    $name = $select['name'];
-                    $durationAppend = (doTypeCastInt($select['plan']) > 1) ? "s" : "";
-                    $datax = [
-                        'status' => true,
-                        'data' => [
-                            'id' => $id,
-                            'name' => $name,
-                            'plan' => doNumberFormat($select['plan']).'/'.getTypeFromTypeId('savings_plan', $select['plan_type_id']),
-                            'duration' => doTypeCastInt($select['duration']).' '.getTypeFromTypeId('savings_duration', $select['duration_type_id']).$durationAppend,
-                            'memebers' => self::getGroupMemebersCount($select['id']),
-                            'is_member' => self::checkIfIsGroupMember($groupId, $userId),
-                            'description' => $select['description'],
-                            /*
-                                To create a redirection from the endpoint below to the api savings_group endpoint for people using the link to join
-                            */
-                            'link' => SITE_LINK.'/join_group?id='.$id
-                        ]
-                    ];
-                    getJsonList($datax);
+                    $data['data'][$counter]['starting_amount'] = doNumberFormat($amount);
+                    $data['data'][$counter]['duration'] = doTypeCastInt($r['duration']).' '.getTypeFromTypeId('savings_duration', $r['duration_type_id']).$durationAppend;
                 }
-                getJsonRow(false, "An error occurred");
+                elseif(in_array($savingsTypeId, [DEF_SAVINGS_TYPE_TARGET, DEF_SAVINGS_TYPE_VAULT]))
+                {
+                    $data['data'][$counter]['amount'] = doNumberFormat($amount);
+                    if($savingsTypeId == DEF_SAVINGS_TYPE_TARGET)
+                    {
+                        $data['data'][$counter]['start_date'] = $r['start_date'];
+                        $data['data'][$counter]['end_date'] = $r['end_date'];
+                        $data['data'][$counter]['duration'] = doTypeCastInt($r['duration']).' '.getTypeFromTypeId('savings_duration', $r['duration_type_id']).$durationAppend;
+                    }
+                    if($savingsTypeId == DEF_SAVINGS_TYPE_VAULT)
+                    {
+                        $data['data'][$counter]['payout_date'] = $r['payout_date'];
+                    }
+                }
+                
+                $data['data'][$counter]['amount_saved'] = doNumberFormat($totalAmountSaved);
+                $data['data'][$counter]['date_created'] = getDateFormat($r['cdate']);
+                $data['data'][$counter]['date_modified'] = getDateFormat($r['mdate']);
+
+                $counter++;
             }
-            getJsonRow(false, "No record found.");
+            getJsonList($data);
         }
+        getJsonRow(false, "No record found.");
+
     }
 
-    public static function doGetSavingsRecord($recordId, $arFields=['*'])
+    public static function doGetSavingsRecord($recordId='', $arFields=['*'])
     {
         global $userId;
 
-        $fields = implode(',', $arFields);
+        $fields = is_array($arFields) ? implode(',', $arFields) : $arFields;
+
+        $whereAppend = [];
+        if(strlen($recordId) == 36)
+        {
+            $whereAppend = ['id' => $recordId];
+        }
+        $whereAppend['user_id'] = $userId;
+        $whereAppend['deleted'] = 0;
 
         $rs = CrudActions::select(
-            DEF_TBL_SAVINGS_TRANS,
+            DEF_TBL_SAVINGS,
             [
                 'columns' => $fields,
-                'where' => ['id' => $recordId]
+                'where' => $whereAppend,
+                'return_type' => 'all'
             ]
         );
         if(count($rs) > 0)
@@ -231,5 +254,64 @@ class Savings {
             return $rs;
         }
         return [];
+    }
+
+    public static function getVaultTypes()
+    {
+        $rs = CrudActions::select(
+            DEF_TBL_SAVINGS_VAULTS,
+            [
+                'columns' => 'id, name, interest',
+                'where' => [
+                    'status' => 1,
+                    'deleted' => 0
+                ],
+                'return_type' => 'all'
+            ]
+        );
+        if(sizeof($rs) > 0)
+        {
+            $data = [
+                'status' => true
+            ];
+            foreach($rs as $r)
+            {
+                $data['data'][] = [
+                    'title' => $r['name'],
+                    'description' => 'earn up to '. doTypeCastInt($r['interest']) . '% interest'
+                ];
+            }
+            getJsonList($data);
+        }
+        getJsonRow(false, "Data could not be fetched.");
+    }
+
+    public static function doGetTotalAmountSaved($recordId)
+    {
+        global $userId;
+
+        $rs = CrudActions::select(
+            self::$tableTrans,
+            [
+                'columns' => 'amount',
+                'where' => [
+                    'parent_id' => $recordId,
+                    'user_id' => $userId,
+                    'status' => 1,
+                    'deleted' => 0
+                ],
+                'return_type' => 'all'
+            ]
+        );
+        if(sizeof($rs) > 0)
+        {
+            $totalAmount = 0;
+            foreach($rs as $r)
+            {
+                $totalAmount += $r['amount'];
+            }
+            return doTypeCastDouble($totalAmount);
+        }
+        return 0;
     }
 }
