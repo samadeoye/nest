@@ -197,14 +197,16 @@ class Savings {
                 ];
                 if($savingsTypeId == DEF_SAVINGS_TYPE_REGULAR)
                 {
-                    $data['data'][$counter]['starting_amount'] = doNumberFormat($amount);
+                    $data['data'][$counter]['starting_amount'] = 'N' . doNumberFormat($amount);
                     $data['data'][$counter]['duration'] = doTypeCastInt($r['duration']).' '.getTypeFromTypeId('savings_duration', $r['duration_type_id']).$durationAppend;
+                    $data['data'][$counter]['plan'] = getTypeFromTypeId('savings_plan', $r['plan_type_id']);
                 }
                 elseif(in_array($savingsTypeId, [DEF_SAVINGS_TYPE_TARGET, DEF_SAVINGS_TYPE_VAULT]))
                 {
                     $data['data'][$counter]['amount'] = doNumberFormat($amount);
                     if($savingsTypeId == DEF_SAVINGS_TYPE_TARGET)
                     {
+                        $data['data'][$counter]['plan'] = getTypeFromTypeId('savings_plan', $r['plan_type_id']);
                         $data['data'][$counter]['start_date'] = $r['start_date'];
                         $data['data'][$counter]['end_date'] = $r['end_date'];
                         $data['data'][$counter]['duration'] = doTypeCastInt($r['duration']).' '.getTypeFromTypeId('savings_duration', $r['duration_type_id']).$durationAppend;
@@ -225,6 +227,39 @@ class Savings {
         }
         getJsonRow(false, "No record found.");
 
+    }
+
+    public static function getSavingsTransactions($recordId)
+    {
+        global $userId;
+
+        $rs = CrudActions::select(
+            self::$tableTrans,
+            [
+                'columns' => 'id, amount, debitcredit',
+                'where' => [
+                    'parent_id' => $recordId,
+                    'user_id' => $userId,
+                    'status' => 1,
+                    'deleted' => 0
+                ],
+                'return_type' => 'all'
+            ]
+        );
+        if(sizeof($rs) > 0)
+        {
+            $data = ['status' => true, 'data' => []];
+            foreach($rs as $r)
+            {
+                $data['data'] = [
+                    'amount' => 'N' . doNumberFormat($r['amount']),
+                    'type' => doTypeCastInt($r['debitcredit']) == 1 ? "debit" : "credit",
+                    'description' => doTypeCastInt($r['debitcredit']) == 1 ? "Savings Topup" : "Paid to Wallet"
+                ];
+            }
+            getJsonList($data);
+        }
+        return [];
     }
 
     public static function doGetSavingsRecord($recordId='', $arFields=['*'])

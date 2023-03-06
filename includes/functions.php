@@ -135,6 +135,7 @@ function doCheckParamIssetEmpty($param, $data)
         'msg' => ''
     ];
     
+    $param = strtolower($param);
     $method = $data['method'];
     $label = $data['label'];
     $length = isset($data['length']) ? $data['length'] : [0,0];
@@ -208,9 +209,9 @@ function doCheckParamIssetEmpty($param, $data)
         if(!$isset)
         {
             $datax['status'] = false;
-            if(strpos($param, '_id') !== false)
+            if(strpos($param, '_id') !== false || $param == 'id')
             {
-                $data['msg'] = $label . ' in invalid.';
+                $datax['msg'] = $label . ' in invalid.';
             }
             else
             {
@@ -225,9 +226,9 @@ function doCheckParamIssetEmpty($param, $data)
         if(!$isset)
         {
             $datax['status'] = false;
-            if(strpos($param, '_id') !== false)
+            if(strpos($param, '_id') !== false || $param == 'id')
             {
-                $data['msg'] = $label . ' in invalid.';
+                $datax['msg'] = $label . ' in invalid.';
             }
             else
             {
@@ -242,9 +243,9 @@ function doCheckParamIssetEmpty($param, $data)
         if(!$isset)
         {
             $datax['status'] = false;
-            if(strpos($param, '_id') !== false)
+            if(strpos($param, '_id') !== false || $param == 'id')
             {
-                $data['msg'] = $label . ' in invalid.';
+                $datax['msg'] = $label . ' in invalid.';
             }
             else
             {
@@ -330,6 +331,10 @@ function getTypeFromTypeId($type, $id)
             elseif($id == 3)
             {
                 return 'monthly';
+            }
+            elseif($id == 4)
+            {
+                return 'anytime';
             }
         }
         elseif(strtolower($type) == 'savings_duration')

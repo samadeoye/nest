@@ -763,6 +763,17 @@ class Params
                     ]
                 ];
             break;
+
+            case 'savings_transactions':
+                $data = [
+                    'savings_id' => [
+                        'method' => 'get',
+                        'length' => [36,36],
+                        'label' => 'Savings',
+                        'required' => true
+                    ]
+                ];
+            break;
         }
         
         return $data;
