@@ -33,7 +33,6 @@ if(in_array($action, ['create', 'update']))
     if($action == 'create')
     {
         $amount = doTypeCastDouble($_POST['starting_amount']);
-        $payFirst = doTypeCastInt($_REQUEST['pay_first']);
     }
 
     /*
@@ -58,6 +57,7 @@ if(in_array($action, ['create', 'update']))
 
 if($action == 'create')
 {
+    $data['plan_amount'] = $data['amount'] = $amount;
     Savings::createSavings($data);
 }
 elseif($action == 'update')

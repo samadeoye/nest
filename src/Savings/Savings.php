@@ -105,7 +105,7 @@ class Savings {
                                 $processDone = false;
                             }
                         }
-                        if($fundingSourceId == DEF_SAVINGS_FUNDING_SOURCE_CARD)
+                        elseif($fundingSourceId == DEF_SAVINGS_FUNDING_SOURCE_CARD)
                         {
                             //initialize payment gateway
                         }
@@ -291,6 +291,34 @@ class Savings {
         return [];
     }
 
+
+    public static function doCheckIfSavingsExists($recordId)
+    {
+        global $userId;
+
+        if(strlen($recordId) == 36)
+        {
+            $rs = CrudActions::select(
+                self::$table,
+                [
+                    'columns' => 'id, deleted',
+                    [
+                        'where' => [
+                            'id' => $recordId,
+                            'user_id' => $userId,
+                            'deleted' => 0
+                        ]
+                    ]
+                ]
+            );
+            if(count($rs) > 0)
+            {
+                return true;
+            }
+            return false;
+        }
+        return false;
+    }
     public static function getVaultTypes()
     {
         $rs = CrudActions::select(
@@ -348,5 +376,82 @@ class Savings {
             return doTypeCastDouble($totalAmount);
         }
         return 0;
+    }
+
+    public static function doSaveAmount($data)
+    {
+        global $userId;
+
+        if(count($data) > 0)
+        {
+            $savingsId = $data['savings_id'];
+            $amountToSave = $data['amount'];
+            $fundingSourceId = $data['funding_source_type_id'];
+            $savedCardId = $data['saved_card_id'];
+
+            if(strlen($savingsId) == 36 && $amountToSave > 0)
+            {
+                if(self::doCheckIfSavingsExists($savingsId))
+                {
+                    $save = CrudActions::insert(
+                        self::$tableTrans,
+                        [
+                            'id' => getNewId(),
+                            'user_id' => $userId,
+                            'parent_id' => $savingsId,
+                            'amount' => $amountToSave,
+                            'funding_source_type_id' => $fundingSourceId,
+                            'cdate' => time()
+                            //to add tdate when when making payment
+                        ]
+                    );
+                    if(!$save)
+                    {
+                        getJsonRow(false, "An error occured while processing your savings.");
+                    }
+                    $processDone = false;
+                    //check if user has enough balance
+                    $balance = doTypeCastDouble(UserActions::getUserInfo('balance'));
+                    if($balance == 0 || $balance < $amountToSave)
+                    {
+                        $processDone = false;
+                        getJsonRow(false, "You do not have enough balance for this transaction.");
+                    }
+                    if($fundingSourceId == DEF_SAVINGS_FUNDING_SOURCE_WALLET)
+                    {
+                        //deduct from user wallet
+                        $newBalance = doTypeCastDouble($balance - $amountToSave);
+                        CrudActions::update(
+                            DEF_TBL_USERS,
+                            ['balance' => $newBalance]
+                        );
+                        $updateTrans = CrudActions::update(
+                            self::$tableTrans,
+                            [
+                                'status' => 1,
+                                'tdate' => time()
+                            ]
+                        );
+                        if(!$updateTrans)
+                        {
+                            $processDone = false;
+                        }
+                    }
+                    elseif($fundingSourceId == DEF_SAVINGS_FUNDING_SOURCE_CARD)
+                    {
+                        //initialize payment gateway
+                    }
+
+                    if($processDone)
+                    {
+                        getJsonRow(true, "Savings transaction completed successfully.");
+                    }
+                    getJsonRow(false, "An error occured while processing your transaction.");
+                }
+                getJsonRow(false, "Savings not found!");
+            }
+            getJsonRow(false, "Savings not found!");
+        }
+        getJsonRow(false, "Invalid request!");
     }
 }

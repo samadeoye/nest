@@ -588,6 +588,12 @@ class Params
                         'type' => 'number',
                         'required' => true
                     ],
+                    'plan_amount' => [
+                        'method' => 'post',
+                        'label' => 'Plan Amount',
+                        'type' => 'number',
+                        'required' => true
+                    ],
                     /*
                         <--- SAVINGS PLAN TYPE ID --->
                         1: daily
@@ -699,6 +705,12 @@ class Params
                         'type' => 'number',
                         'required' => true
                     ],
+                    'plan_amount' => [
+                        'method' => 'post',
+                        'label' => 'Plan Amount',
+                        'type' => 'number',
+                        'required' => true
+                    ],
                     //to make a separate endpoint for vault types list
                     'vault_type_id' => [
                         'method' => 'post',
@@ -764,7 +776,7 @@ class Params
                 ];
             break;
 
-            case 'savings_transactions':
+            case 'get_savings_transactions':
                 $data = [
                     'savings_id' => [
                         'method' => 'get',
@@ -772,6 +784,34 @@ class Params
                         'label' => 'Savings',
                         'required' => true
                     ]
+                ];
+            break;
+
+            case 'savings_topup':
+                $data = [
+                    'savings_id' => [
+                        'method' => 'get',
+                        'length' => [36,36],
+                        'label' => 'Savings',
+                        'required' => true
+                    ],
+                    'amount' => [
+                        'method' => 'post',
+                        'label' => 'Amount to Save',
+                        'type' => 'number',
+                        'required' => true
+                    ],
+                    'funding_source_type_id' => [
+                        'method' => 'post',
+                        'length' => [1,1],
+                        'label' => 'Funding Source',
+                        'required' => true
+                    ],
+                    'saved_card_id' => [
+                        'method' => 'post',
+                        'length' => [36,36],
+                        'label' => 'Saved Card'
+                    ],
                 ];
             break;
         }

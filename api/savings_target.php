@@ -41,6 +41,7 @@ if(in_array($action, ['create', 'update']))
         $fundingSourceId = trim($_REQUEST['funding_source_type_id']);
         $savedCardId = isset($_REQUEST['saved_card_id']) ? trim($_REQUEST['saved_card_id']) : "";
         $amount = doTypeCastDouble($_POST['target_amount']);
+        $planAmount = doTypeCastDouble($_POST['plan_amount']);
         $startDate = isset($_REQUEST['start_date']) ? trim($_REQUEST['start_date']) : "";
         $endDate = isset($_REQUEST['end_date']) ? trim($_REQUEST['end_date']) : "";
 
@@ -48,6 +49,7 @@ if(in_array($action, ['create', 'update']))
             'type_id' => DEF_SAVINGS_TYPE_TARGET,
             'name' => $name,
             'amount' => $amount,
+            'plan_amount' => $planAmount,
             'plan_type_id' => $planTypeId,
             'duration' => $duration,
             'duration_type_id' => $durationTypeId,
