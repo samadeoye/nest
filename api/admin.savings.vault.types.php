@@ -1,6 +1,5 @@
 <?php
 use Nest\Crud\CrudActions;
-require_once '../includes/util.php';
 
 $name = isset($_REQUEST['name']) ? trim($_REQUEST['name']) : "";
 

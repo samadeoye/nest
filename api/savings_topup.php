@@ -1,7 +1,6 @@
 <?php
 use Nest\Params\Params;
 use Nest\Savings\Savings;
-require_once '../includes/util.php';
 
 $params = Params::getRequestParams('savings_topup');
 doValidateApiParams($params);

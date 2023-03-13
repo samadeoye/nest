@@ -169,7 +169,7 @@ function doCheckParamIssetEmpty($param, $data)
         if(!$isset)
         {
             $datax['status'] = false;
-            $datax['msg'] = $label . ' ' . MSG_IS_REQUIRED;
+            $datax['msg'] = $label . ' is required.';
             return $datax;
         }
     }
@@ -215,7 +215,7 @@ function doCheckParamIssetEmpty($param, $data)
             }
             else
             {
-                $datax['msg'] = $label . ' ' . MSG_MUST_BE_EQUAL_TO . ' ' . $length[0] .' '. strtolower(LBL_CHARACTERS);
+                $datax['msg'] = $label . ' must be equal to ' . $length[0] .' characters.';
             }
             return $datax;
         }
@@ -232,7 +232,7 @@ function doCheckParamIssetEmpty($param, $data)
             }
             else
             {
-                $datax['msg'] = $label . ' ' . MSG_MUST_BE_GREATER_THAN_EQUAL . ' ' . $length[0] .' '. strtolower(LBL_CHARACTERS);
+                $datax['msg'] = $label . ' must be greater than or equal to ' . $length[0] .' characters.';
             }
             return $datax;
         }
@@ -249,7 +249,7 @@ function doCheckParamIssetEmpty($param, $data)
             }
             else
             {
-                $datax['msg'] = $label . ' ' . MSG_MUST_BE_LESS_THAN_EQUAL . ' ' . $length[1] .' '. strtolower(LBL_CHARACTERS);
+                $datax['msg'] = $label . ' must be less than or equal to ' . $length[1] .' characters.';
             }
             return $datax;
         }

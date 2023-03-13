@@ -1,5 +1,4 @@
 <?php
-require_once '../includes/util.php';
 
 $data = ['status' => true];
 

@@ -1,7 +1,6 @@
 <?php
 use Nest\Params\Params;
 use Nest\Users\UserActions;
-require_once '../includes/util.php';
 
 $params = Params::getRequestParams('forgot_password');
 doValidateApiParams($params);
